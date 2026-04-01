@@ -91,6 +91,7 @@ const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZ
 const sb=supabase.createClient(SB_URL,SB_KEY);
 const TABLE='ads';
 
+  
 const TONES=[{v:'Humor',d:'Uses comedy or absurdity to earn attention and lower defenses'},{v:'Empathetic',d:"Mirrors the operator's stress or frustration before offering relief"},{v:'Provocative',d:'Designed to create mild tension or challenge an assumption'},{v:'Direct / Authoritative',d:'Straightforward and credibility-first. States the fact or leads with proof.'},{v:'TBD',d:''}];
 const PRODS=[{v:'AI-Generated',d:'Visuals created entirely with AI image or video generation tools'},{v:'Live Shoot',d:'Real footage shot on location with a crew or handheld camera'},{v:'Motion Design',d:'Animated graphics, type, or illustrated elements built in post'},{v:'Stock',d:'Licensed footage or imagery from a stock library'},{v:'TBD',d:''}];
 const VISUALS=[{v:'Cinematic',d:'Polished, high-production. Looks like a TV spot or short film.'},{v:'Handheld / Documentary',d:'Raw, real-feeling. Shot on location in the moment.'},{v:'Talking Head',d:'Someone speaking directly to camera.'},{v:'Typography-Led',d:'Words and numbers are the visual. Text animates on screen.'},{v:'Graphic / Illustrated',d:'Charts, callouts, drawn visuals. Designed rather than filmed.'},{v:'Split Screen / Comparison',d:'Side-by-side structure. Two things being contrasted visually.'},{v:'Screen / UI',d:'The product interface is the visual.'},{v:'Mixed',d:'Combines two styles — e.g. handheld footage with text overlays.'},{v:'TBD',d:''}];
