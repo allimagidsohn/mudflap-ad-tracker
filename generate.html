@@ -109,7 +109,6 @@ const COPY_S={Reel:{note:'Reels run full-screen. Only Primary Text appears in fe
 const SC_BG={Briefs:'#dbeafe','In Copy Production':'#fef9c3','Needs Copy Review':'#ffedd5','In Design':'#fce7f3',Live:'#dcfce7',Winner:'#ede9fe',Archive:'#f3f4f6'};
 const SC_TX={Briefs:'#1e40af','In Copy Production':'#713f12','Needs Copy Review':'#7c2d12','In Design':'#831843',Live:'#14532d',Winner:'#4c1d95',Archive:'#374151'};
 const STAT_COLORS={Briefs:'#1e40af','In Copy Production':'#713f12','Needs Copy Review':'#7c2d12','In Design':'#831843',Live:'#14532d',Winner:'#4c1d95',Archive:'#374151'};
-// Word count guidance per scene (based on ~2.5 words/sec speaking pace)
 const SCENE_DEFS=[
   {id:'ha',label:'Scene 1 — Hook A',timing:'0–2s',wc:'~5 words'},
   {id:'hb',label:'Scene 1 — Hook B',timing:'0–2s',wc:'~5 words'},
@@ -127,7 +126,8 @@ function blankScenes(){return SCENE_DEFS.map(s=>({...s,vo:'',prompt:''}));}
 function blankForm(){return{concept:'',funnelStage:'',job:'',format:'Reel',tone:'',productionMethod:'',visualStyle:'',status:'Briefs',coreInsight:'',hypothesis:'',notes:'',metaCopy:{primaryText:'',headline:'',description:'',displayUrl:''},scenes:blankScenes(),metrics:{thumbStop:'',viewRate:'',completionRate:'',ctr:'',cpa:'',notes:''}};}
 let form=blankForm();
 
-function toneClass(t){const m={'Humor':'pt-humor','Empathetic':'pt-empathetic','Provocative':'pt-provocative','Direct / Authoritative':'pt-direct','TBD':'pt-tbd'};return m[t]||'pt-tbd';}return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function toneClass(t){const m={'Humor':'pt-humor','Empathetic':'pt-empathetic','Provocative':'pt-provocative','Direct / Authoritative':'pt-direct','TBD':'pt-tbd'};return m[t]||'pt-tbd';}
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function ea(s){return(s||'').replace(/'/g,'&#39;').replace(/\n/g,'\\n');}
 function spill(s){const bg=SC_BG[s]||'#f3f4f6',tx=SC_TX[s]||'#374151';return`<span class="pill" style="background:${bg};color:${tx};border:1px solid ${tx}33">${s}</span>`;}
 function toast(m){const e=document.getElementById('toast');e.textContent=m;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),2500);}
@@ -165,18 +165,14 @@ function render(){document.getElementById('app').innerHTML=html();}
 
 function html(){
   const byStatus=s=>ads.filter(a=>a.status===s);
-
   const statsBar=`<div class="stats">${ALL_ST.map(s=>`<div class="stat" onclick="setVTab('${s}')" style="cursor:pointer;${viewTab===s?'border-color:'+STAT_COLORS[s]+';box-shadow:0 0 0 2px '+STAT_COLORS[s]+'22':''}"><div class="sv" style="color:${STAT_COLORS[s]}">${byStatus(s).length}</div><div class="sl">${s}</div></div>`).join('')}</div>`;
-
   const filters=`<div class="flt"><input value="${esc(search)}" oninput="setSearch(this.value)" placeholder="Search…"><select onchange="setStage(this.value)"><option value="All" ${fStage==='All'?'selected':''}>All Stages</option>${STAGES.filter(s=>s!=='TBD').map(s=>`<option ${fStage===s?'selected':''}>${s}</option>`).join('')}</select><select onchange="setGroup(this.value)" style="width:210px"><option value="All" ${fGroup==='All'?'selected':''}>All Briefs / Pillars</option>${GROUPS.map(g=>`<option value="${g}" ${fGroup===g?'selected':''}>${g}</option>`).join('')}</select>${(search||fStage!=='All'||fGroup!=='All')?'<button class="bcl" onclick="clrFlt()">Clear</button>':''}</div>`;
-
   const grp=filt(byStatus(viewTab));
   const showPerf=['Live','Winner'].includes(viewTab);
   const content=`<div class="grp">
     <div class="grp-hdr">${spill(viewTab)}<span class="grp-cnt">${grp.length} ad${grp.length!==1?'s':''}</span></div>
     ${grp.length?grp.map(a=>card(a,showPerf)).join(''):'<div class="empty-grp">No ads in this stage yet.</div>'}
   </div>`;
-
   return`<div class="hdr"><div><div class="hdr-t">🚛 Mudflap Ad Creative Tracker</div><div class="hdr-s">Meta · Heavy 5+ Fleets · ${saving?'Saving…':'Auto-saved'} · ${ads.length} ads</div></div><button class="btn-p" onclick="oNew()">+ New Brief</button></div>
 ${statsBar}${filters}
 <div class="con">${content}</div>
