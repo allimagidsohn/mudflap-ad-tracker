@@ -165,7 +165,7 @@ function html(){
   const up=ads.filter(a=>a.status==='Upcoming'),ip=ads.filter(a=>PROD_ST.includes(a.status)),arc=ads.filter(a=>ARC_ST.includes(a.status));
   const live=ads.filter(a=>a.status==='Live'),win=ads.filter(a=>a.status==='Winner'),rev=ads.filter(a=>a.status==='Needs Copy Review'),des=ads.filter(a=>a.status==='In Design');
   const TABS=[{l:'💡 Upcoming',cnt:up.length},{l:'🎬 In Production',cnt:ip.length},{l:'🗄️ Archive',cnt:arc.length},{l:'📊 Table',cnt:ads.length}];
-  const sopts=tab===0?['Upcoming',...PROD_ST]:tab===1?PROD_ST:ARC_ST;
+ const sopts=tab===0?['Upcoming',...PROD_ST]:tab===1?[...PROD_ST,...ARC_ST]:ARC_ST;
   let content='';
   if(tab===0){const r=filt(up);content=r.length?r.map(a=>card(a,sopts)).join(''):'<div class="empty">No upcoming concepts match.</div>';}
   else if(tab===1){
