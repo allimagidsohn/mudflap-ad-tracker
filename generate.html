@@ -3,199 +3,269 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🤖 Hook Generator</title>
+<title>🚛 Mudflap Ad Creative Tracker</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f9fafb;color:#111827;min-height:100vh;padding:32px 20px}
-.wrap{max-width:640px;margin:0 auto}
-h1{font-size:20px;font-weight:700;margin-bottom:6px}
-.sub{font-size:13px;color:#6b7280;margin-bottom:24px}
-.cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
-.card{background:white;border:1px solid #e5e7eb;border-radius:10px;padding:16px;text-align:center}
-.card .num{font-size:28px;font-weight:700}
-.card .lbl{font-size:12px;color:#9ca3af;margin-top:2px}
-.list{background:white;border:1px solid #e5e7eb;border-radius:8px;max-height:200px;overflow-y:auto;margin-bottom:16px}
-.list-row{padding:8px 12px;border-bottom:1px solid #f3f4f6;font-size:12px;display:flex;justify-content:space-between;align-items:center}
-.list-row:last-child{border-bottom:none}
-.list-row .name{font-weight:500;color:#111827}
-.list-row .missing{color:#9ca3af}
-.btn{width:100%;background:#2563eb;color:white;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:16px}
-.btn:hover{background:#1d4ed8}
-.btn:disabled{background:#93c5fd;cursor:not-allowed}
-.progress-row{display:flex;justify-content:space-between;font-size:12px;color:#6b7280;margin-bottom:6px}
-.bar-bg{background:#e5e7eb;border-radius:99px;height:8px;overflow:hidden;margin-bottom:16px}
-.bar-fill{background:#2563eb;height:100%;transition:width 0.3s}
-.log{background:#111827;border-radius:10px;padding:14px;max-height:300px;overflow-y:auto}
-.log-line{font-size:12px;font-family:monospace;margin-bottom:3px}
-.log-line.success{color:#4ade80}
-.log-line.error{color:#f87171}
-.log-line.info{color:#e5e7eb}
-.done-box{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:16px;font-size:13px;color:#15803d;margin-bottom:16px}
-.empty-box{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:16px;font-size:13px;color:#15803d;margin-bottom:16px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f9fafb;color:#111827;min-height:100vh}
+button,input,select,textarea{font-family:inherit}
+.hdr{background:white;border-bottom:1px solid #e5e7eb;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20}
+.hdr-t{font-size:15px;font-weight:700}.hdr-s{font-size:11px;color:#9ca3af;margin-top:1px}
+.btn-p{background:#2563eb;color:white;border:none;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:600;cursor:pointer}
+.btn-p:hover{background:#1d4ed8}
+.stats{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;padding:14px 20px}
+.stat{background:white;border:1px solid #e5e7eb;border-radius:10px;padding:10px;text-align:center;cursor:pointer;transition:box-shadow .15s}
+.stat:hover{box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.sv{font-size:20px;font-weight:700}.sl{font-size:10px;color:#9ca3af;margin-top:1px}
+.flt{padding:0 20px 12px;display:flex;gap:8px;flex-wrap:wrap}
+.flt input,.flt select{border:1px solid #e5e7eb;border-radius:8px;padding:7px 10px;font-size:13px;background:white}
+.flt input{width:180px}.flt select{width:160px}
+.bcl{font-size:12px;padding:5px 10px;border-radius:6px;border:1px solid #e5e7eb;background:white;color:#6b7280;cursor:pointer}
+.con{padding:0 20px 40px}
+.grp{margin-bottom:28px}
+.grp-hdr{display:flex;align-items:center;gap:8px;margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid #f3f4f6}
+.grp-cnt{font-size:11px;color:#9ca3af;background:#f3f4f6;padding:1px 7px;border-radius:99px}
+.card{background:white;border:1px solid #e5e7eb;border-radius:10px;margin-bottom:8px;overflow:hidden}
+.card.win{border-color:#a78bfa}
+.ch{padding:12px 14px;display:flex;align-items:flex-start;gap:10px}
+.ci{flex:1;min-width:0}
+.cpills{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:3px}
+.ct{font-size:13px;font-weight:600;color:#111827}
+.cins{font-size:12px;color:#6b7280;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cnot{font-size:11px;color:#9ca3af;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ca{display:flex;gap:5px;flex-shrink:0;align-items:center}
+.ca select{font-size:11px;border:1px solid #e5e7eb;border-radius:6px;padding:3px 5px;background:white;cursor:pointer}
+.pill{font-size:11px;padding:1px 8px;border-radius:99px;font-weight:500;white-space:nowrap}
+.ps{background:#dbeafe;color:#1e40af}
+.pf{background:#f3f4f6;color:#374151}
+.pt-humor{background:#fef9c3;color:#713f12}
+.pt-empathetic{background:#dbeafe;color:#1e40af}
+.pt-provocative{background:#fce7f3;color:#831843}
+.pt-direct{background:#dcfce7;color:#14532d}
+.pt-tbd{background:#f3f4f6;color:#6b7280}
+.cb{border-top:1px solid #f3f4f6;padding:12px 14px;background:#f9fafb;display:flex;flex-direction:column;gap:12px}
+.cm{display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px}
+.ml{font-weight:600;color:#9ca3af;font-size:10px;text-transform:uppercase}
+.mv{color:#374151}
+.st{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#9ca3af;margin-bottom:6px}
+.sb{border:1px solid #e5e7eb;border-radius:8px;padding:8px 10px;background:white;font-size:12px;margin-bottom:6px}
+.sr{margin-bottom:4px}
+.srl{font-size:11px;font-weight:600;color:#9ca3af;display:flex;justify-content:space-between;align-items:center;margin-bottom:2px}
+.cpb{font-size:11px;padding:2px 7px;border-radius:4px;border:1px solid #e5e7eb;background:#f9fafb;color:#9ca3af;cursor:pointer}
+.cpb.ok{background:#dcfce7;color:#15803d}
+.mr{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;background:white;border:1px solid #e5e7eb;border-radius:8px;padding:6px 10px;font-size:12px;margin-bottom:4px}
+.pg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.pg label{font-size:11px;color:#9ca3af;display:block;margin-bottom:2px}
+.pg input{border:1px solid #e5e7eb;border-radius:6px;padding:3px 7px;font-size:12px;width:100%}
+.empty-grp{font-size:12px;color:#d1d5db;font-style:italic;padding:8px 0}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:50;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;padding:28px 14px}
+.mod{background:white;border-radius:14px;width:100%;max-width:620px;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.mh{padding:18px 24px;border-bottom:1px solid #f3f4f6;display:flex;justify-content:space-between;align-items:flex-start}
+.mt{font-size:17px;font-weight:700}.ms{font-size:11px;color:#9ca3af;margin-top:1px}
+.mc{font-size:20px;background:none;border:none;color:#9ca3af;line-height:1;cursor:pointer}
+.mb{padding:20px 24px;display:flex;flex-direction:column;gap:22px}
+.mf{padding:14px 24px;border-top:1px solid #f3f4f6;display:flex;justify-content:space-between;align-items:center}
+.fst{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#9ca3af;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #f3f4f6}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.fg{margin-bottom:12px}
+.fl{display:block;font-size:13px;font-weight:600;color:#374151;margin-bottom:3px}
+.fi,.fs,.fa{border:1px solid #e5e7eb;border-radius:8px;padding:7px 10px;font-size:13px;width:100%;background:white}
+.fa{resize:none}
+.fh{font-size:11px;color:#6b7280;margin-top:4px;background:#f9fafb;border-radius:6px;padding:6px 8px}
+.lk{border:1px dashed #e5e7eb;border-radius:10px;padding:18px;text-align:center}
+.lt{font-size:13px;font-weight:500;color:#9ca3af}.ls{font-size:12px;color:#9ca3af;margin-top:3px}
+.scf{border:1px solid #e5e7eb;border-radius:10px;padding:12px;background:#f9fafb;margin-bottom:10px}
+.wc{font-size:10px;color:#9ca3af;background:white;border:1px solid #e5e7eb;border-radius:99px;padding:1px 7px}
+.csp{background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:8px 12px;margin-bottom:12px}
+.cspt{font-size:12px;font-weight:600;color:#1e40af;margin-bottom:1px}
+.cspn{font-size:12px;color:#3b82f6}
+.cc{font-size:11px}.co{color:#ef4444;font-weight:700}.ck{color:#9ca3af}
+.br{border-color:#fca5a5!important}
+.toast{position:fixed;bottom:20px;right:20px;background:#111827;color:white;padding:10px 16px;border-radius:8px;font-size:13px;z-index:100;opacity:0;transition:opacity .2s}
+.toast.show{opacity:1}
+.load{display:flex;align-items:center;justify-content:center;height:60vh;color:#9ca3af;font-size:14px}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <h1>🤖 Hook B/C + Primary Text Generator</h1>
-  <p class="sub">Generates missing Hook B, Hook C, and Primary Text for all ads using Claude AI, then saves directly to Supabase.</p>
-  <div class="cards">
-    <div class="card"><div class="num" id="total-count">—</div><div class="lbl">Total ads</div></div>
-    <div class="card"><div class="num" id="needs-count" style="color:#d97706">—</div><div class="lbl">Need generation</div></div>
-  </div>
-  <div id="list-wrap"></div>
-  <div id="progress-wrap" style="display:none">
-    <div class="progress-row"><span id="progress-label">Starting…</span><span id="progress-frac">0/0</span></div>
-    <div class="bar-bg"><div class="bar-fill" id="bar" style="width:0%"></div></div>
-  </div>
-  <button class="btn" id="go-btn" onclick="generate()" disabled>Loading…</button>
-  <div id="log-wrap" style="display:none"><div class="log" id="log"></div></div>
-</div>
-
+<div id="app"></div>
+<div class="toast" id="toast"></div>
 <script>
 const SB_URL='https://fngxmhqkowrkzpgcofbn.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZuZ3htaHFrb3dya3pwZ2NvZmJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODQ3ODgsImV4cCI6MjA5MDU2MDc4OH0.rjLoi5Pz4d5UP_XF3AnxJ2ViY-jxpetwz_U7tWPWsoo';
 const sb=supabase.createClient(SB_URL,SB_KEY);
+const TABLE='ads';
 
-let allAds=[], needsWork=[];
+const TONES=[{v:'Humor',d:'Uses comedy or absurdity to earn attention and lower defenses'},{v:'Empathetic',d:"Mirrors the operator's stress or frustration before offering relief"},{v:'Provocative',d:'Designed to create mild tension or challenge an assumption'},{v:'Direct / Authoritative',d:'Straightforward and credibility-first. States the fact or leads with proof.'},{v:'TBD',d:''}];
+const PRODS=[{v:'AI-Generated',d:'Visuals created entirely with AI image or video generation tools'},{v:'Live Shoot',d:'Real footage shot on location with a crew or handheld camera'},{v:'Motion Design',d:'Animated graphics, type, or illustrated elements built in post'},{v:'Stock',d:'Licensed footage or imagery from a stock library'},{v:'TBD',d:''}];
+const VISUALS=[{v:'Cinematic',d:'Polished, high-production. Looks like a TV spot or short film.'},{v:'Handheld / Documentary',d:'Raw, real-feeling. Shot on location in the moment.'},{v:'Talking Head',d:'Someone speaking directly to camera.'},{v:'Typography-Led',d:'Words and numbers are the visual. Text animates on screen.'},{v:'Graphic / Illustrated',d:'Charts, callouts, drawn visuals. Designed rather than filmed.'},{v:'Split Screen / Comparison',d:'Side-by-side structure. Two things being contrasted visually.'},{v:'Screen / UI',d:'The product interface is the visual.'},{v:'Mixed',d:'Combines two styles — e.g. handheld footage with text overlays.'},{v:'TBD',d:''}];
+const STAGES=['Awareness','Consideration','Intent','Retargeting','Usage/Expansion','TBD'];
+const JOBS=['Interrupt','Reframe','Prove','Convert','Reinforce','Validate','TBD'];
+const FMTS=['Reel','Carousel','Static','Video (Feed)'];
+const ALL_ST=['Briefs','In Copy Production','Needs Copy Review','In Design','Live','Winner','Archive'];
+const GROUPS=['Brief 1 — Self-Aware AI','Brief 2 — Lifestyle / Chaos','Brief 3 — Math Motion','Brief 4 — Inertia / Habits','Brief 5 — Health / Peace of Mind','Brief 6 — Absurd Fees','Brief 7 — Customer Support','Pillar 1 — Money / Business','Pillar 2 — Life / Identity','Pillar 3 — Debate','Pillar 4 — Trucks and Tech','Pillar 5 — Health & Wellbeing','Pillar 6 — Roadcraft','Pillar 7 — Status / Respect','Claims Ads','Doc 1'];
+const STAGE_D={Awareness:"They have a pain but haven't done anything about it. Job: interrupt and make the problem feel real.",Consideration:"They're thinking 'maybe there's a better way.' Job: shift their thinking.",Intent:'Actively comparing options. Job: prove Mudflap is best and remove doubt.',Retargeting:"Seen the ads but haven't signed up. Job: nudge over the finish line.",'Usage/Expansion':'Already using Mudflap. Job: validate their decision and build identity.',TBD:''};
+const FMT_D={Reel:'Short, punchy videos. Top of funnel, grab attention cold. Hook must land in 1 second.','Video (Feed)':'Slightly longer. Build trust with testimonials or storytelling.',Carousel:'Swipeable cards. Walk someone through a logical argument step by step.',Static:"Simple, cheap, fast. Best for reminding people who've already seen the brand."};
+const COPY_S={Reel:{note:'Reels run full-screen. Only Primary Text appears in feed entry points.',f:[{k:'primaryText',l:'Primary Text',lim:125}]},'Video (Feed)':{note:'Feed video shows Primary Text above, Headline + Description below.',f:[{k:'primaryText',l:'Primary Text',lim:125},{k:'headline',l:'Headline',lim:40},{k:'description',l:'Description',lim:30}]},Static:{note:'Image ads support the full suite of copy fields.',f:[{k:'primaryText',l:'Primary Text',lim:125},{k:'headline',l:'Headline',lim:40},{k:'description',l:'Description',lim:30},{k:'displayUrl',l:'Display URL',lim:255}]},Carousel:{note:'Overall Primary Text at top, then each card has its own Headline and Description.',f:[{k:'primaryText',l:'Primary Text',lim:125},{k:'headline',l:'Per-Card Headline',lim:40},{k:'description',l:'Per-Card Description',lim:20},{k:'displayUrl',l:'Display URL',lim:255}]}};
+const SC_BG={Briefs:'#dbeafe','In Copy Production':'#fef9c3','Needs Copy Review':'#ffedd5','In Design':'#fce7f3',Live:'#dcfce7',Winner:'#ede9fe',Archive:'#f3f4f6'};
+const SC_TX={Briefs:'#1e40af','In Copy Production':'#713f12','Needs Copy Review':'#7c2d12','In Design':'#831843',Live:'#14532d',Winner:'#4c1d95',Archive:'#374151'};
+const STAT_COLORS={Briefs:'#1e40af','In Copy Production':'#713f12','Needs Copy Review':'#7c2d12','In Design':'#831843',Live:'#14532d',Winner:'#4c1d95',Archive:'#374151'};
+// Word count guidance per scene (based on ~2.5 words/sec speaking pace)
+const SCENE_DEFS=[
+  {id:'ha',label:'Scene 1 — Hook A',timing:'0–2s',wc:'~5 words'},
+  {id:'hb',label:'Scene 1 — Hook B',timing:'0–2s',wc:'~5 words'},
+  {id:'hc',label:'Scene 1 — Hook C',timing:'0–2s',wc:'~5 words'},
+  {id:'pr',label:'Scene 2 — Problem',timing:'2–5s',wc:'~8 words'},
+  {id:'ins',label:'Scene 3 — Insight',timing:'5–8s',wc:'~8 words'},
+  {id:'sol',label:'Scene 4 — Solution',timing:'8–12s',wc:'~10 words'},
+  {id:'ct',label:'Scene 5 — CTA',timing:'12–15s',wc:'~8 words'}
+];
 
-function needsGen(ad){
-  const sc=ad.scenes||[];
-  const hb=sc.find(s=>s.id==='hb');
-  const hc=sc.find(s=>s.id==='hc');
-  const meta=ad.meta_copy||{};
-  return !hb?.vo||!hc?.vo||!meta.primaryText;
+let ads=[],viewTab='Briefs',search='',fStage='All',fGroup='All';
+let expIds=new Set(),showForm=false,editId=null,saving=false;
+
+function blankScenes(){return SCENE_DEFS.map(s=>({...s,vo:'',prompt:''}));}
+function blankForm(){return{concept:'',funnelStage:'',job:'',format:'Reel',tone:'',productionMethod:'',visualStyle:'',status:'Briefs',coreInsight:'',hypothesis:'',notes:'',metaCopy:{primaryText:'',headline:'',description:'',displayUrl:''},scenes:blankScenes(),metrics:{thumbStop:'',viewRate:'',completionRate:'',ctr:'',cpa:'',notes:''}};}
+let form=blankForm();
+
+function toneClass(t){const m={'Humor':'pt-humor','Empathetic':'pt-empathetic','Provocative':'pt-provocative','Direct / Authoritative':'pt-direct','TBD':'pt-tbd'};return m[t]||'pt-tbd';}return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function ea(s){return(s||'').replace(/'/g,'&#39;').replace(/\n/g,'\\n');}
+function spill(s){const bg=SC_BG[s]||'#f3f4f6',tx=SC_TX[s]||'#374151';return`<span class="pill" style="background:${bg};color:${tx};border:1px solid ${tx}33">${s}</span>`;}
+function toast(m){const e=document.getElementById('toast');e.textContent=m;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),2500);}
+
+async function load(){
+  document.getElementById('app').innerHTML='<div class="load">Loading tracker…</div>';
+  const{data,error}=await sb.from(TABLE).select('*').order('created_at',{ascending:true});
+  if(error){document.getElementById('app').innerHTML=`<div class="load">Error: ${error.message}</div>`;return;}
+  ads=(data||[]).map(r=>({...r,scenes:r.scenes||blankScenes(),metaCopy:r.meta_copy||{primaryText:'',headline:'',description:'',displayUrl:''},metrics:r.metrics||{thumbStop:'',viewRate:'',completionRate:'',ctr:'',cpa:'',notes:''}}));
+  render();
 }
 
-async function init(){
-  const{data}=await sb.from('ads').select('*').order('created_at',{ascending:true});
-  allAds=data||[];
-  needsWork=allAds.filter(needsGen);
-
-  document.getElementById('total-count').textContent=allAds.length;
-  const nc=document.getElementById('needs-count');
-  nc.textContent=needsWork.length;
-  nc.style.color=needsWork.length>0?'#d97706':'#16a34a';
-
-  const listWrap=document.getElementById('list-wrap');
-  if(needsWork.length===0){
-    listWrap.innerHTML='<div class="empty-box">✓ All ads already have Hook B, Hook C, and Primary Text!</div>';
-    document.getElementById('go-btn').style.display='none';
-    return;
+async function saveAd(d){
+  const row={concept:d.concept,funnel_stage:d.funnelStage,job:d.job,format:d.format,tone:d.tone,production_method:d.productionMethod,visual_style:d.visualStyle,week:'',status:d.status,core_insight:d.coreInsight,hypothesis:d.hypothesis,notes:d.notes,scenes:d.scenes,meta_copy:d.metaCopy,metrics:d.metrics,primary_text:d.metaCopy?.primaryText||''};
+  if(d.id&&!String(d.id).startsWith('n_')){
+    const{error}=await sb.from(TABLE).update(row).eq('id',d.id);
+    if(error){toast('Save failed: '+error.message);return false;}
+    ads=ads.map(a=>a.id===d.id?{...d,...row}:a);
+  }else{
+    const{data:ins,error}=await sb.from(TABLE).insert(row).select().single();
+    if(error){toast('Save failed: '+error.message);return false;}
+    ads=[{...d,id:ins.id,created_at:ins.created_at},...ads];
   }
-
-  let rows=needsWork.map(ad=>{
-    const sc=ad.scenes||[];
-    const hb=sc.find(s=>s.id==='hb');
-    const hc=sc.find(s=>s.id==='hc');
-    const meta=ad.meta_copy||{};
-    const missing=[];
-    if(!hb?.vo)missing.push('Hook B');
-    if(!hc?.vo)missing.push('Hook C');
-    if(!meta.primaryText)missing.push('Primary Text');
-    return`<div class="list-row"><span class="name">${ad.concept}</span><span class="missing">${missing.join(', ')}</span></div>`;
-  }).join('');
-  listWrap.innerHTML=`<div class="list">${rows}</div>`;
-
-  const btn=document.getElementById('go-btn');
-  btn.textContent=`Generate for ${needsWork.length} ad${needsWork.length!==1?'s':''}`;
-  btn.disabled=false;
+  return true;
 }
 
-function log(msg,type='info'){
-  const wrap=document.getElementById('log-wrap');
-  wrap.style.display='block';
-  const el=document.getElementById('log');
-  const line=document.createElement('div');
-  line.className=`log-line ${type}`;
-  line.textContent=msg;
-  el.appendChild(line);
-  el.scrollTop=el.scrollHeight;
+async function doStatus(id,status){saving=true;render();await sb.from(TABLE).update({status}).eq('id',id);ads=ads.map(a=>a.id===id?{...a,status}:a);saving=false;render();}
+async function doDelete(id){await sb.from(TABLE).delete().eq('id',id);ads=ads.filter(a=>a.id!==id);render();}
+async function doMetric(id,k,v){const a=ads.find(x=>x.id===id);if(!a)return;const metrics={...(a.metrics||{}),[k]:v};ads=ads.map(x=>x.id===id?{...x,metrics}:x);await sb.from(TABLE).update({metrics}).eq('id',id);}
+async function doDupe(id){const a=ads.find(x=>x.id===id);if(!a)return;const c={...a,id:'n_'+Date.now(),concept:a.concept+' (Copy)',status:'Briefs',metrics:{thumbStop:'',viewRate:'',completionRate:'',ctr:'',cpa:'',notes:''},scenes:(a.scenes||blankScenes()).map(s=>({...s})),metaCopy:{...(a.metaCopy||{})}};saving=true;render();await saveAd(c);saving=false;render();toast('Duplicated!');}
+
+function filt(list){const q=search.toLowerCase();return list.filter(e=>{const ms=!q||(e.concept||'').toLowerCase().includes(q)||(e.coreInsight||'').toLowerCase().includes(q)||(e.notes||'').toLowerCase().includes(q);return ms&&(fStage==='All'||e.funnelStage===fStage)&&(fGroup==='All'||(e.notes||'').startsWith(fGroup));});}
+
+function render(){document.getElementById('app').innerHTML=html();}
+
+function html(){
+  const byStatus=s=>ads.filter(a=>a.status===s);
+
+  const statsBar=`<div class="stats">${ALL_ST.map(s=>`<div class="stat" onclick="setVTab('${s}')" style="cursor:pointer;${viewTab===s?'border-color:'+STAT_COLORS[s]+';box-shadow:0 0 0 2px '+STAT_COLORS[s]+'22':''}"><div class="sv" style="color:${STAT_COLORS[s]}">${byStatus(s).length}</div><div class="sl">${s}</div></div>`).join('')}</div>`;
+
+  const filters=`<div class="flt"><input value="${esc(search)}" oninput="setSearch(this.value)" placeholder="Search…"><select onchange="setStage(this.value)"><option value="All" ${fStage==='All'?'selected':''}>All Stages</option>${STAGES.filter(s=>s!=='TBD').map(s=>`<option ${fStage===s?'selected':''}>${s}</option>`).join('')}</select><select onchange="setGroup(this.value)" style="width:210px"><option value="All" ${fGroup==='All'?'selected':''}>All Briefs / Pillars</option>${GROUPS.map(g=>`<option value="${g}" ${fGroup===g?'selected':''}>${g}</option>`).join('')}</select>${(search||fStage!=='All'||fGroup!=='All')?'<button class="bcl" onclick="clrFlt()">Clear</button>':''}</div>`;
+
+  const grp=filt(byStatus(viewTab));
+  const showPerf=['Live','Winner'].includes(viewTab);
+  const content=`<div class="grp">
+    <div class="grp-hdr">${spill(viewTab)}<span class="grp-cnt">${grp.length} ad${grp.length!==1?'s':''}</span></div>
+    ${grp.length?grp.map(a=>card(a,showPerf)).join(''):'<div class="empty-grp">No ads in this stage yet.</div>'}
+  </div>`;
+
+  return`<div class="hdr"><div><div class="hdr-t">🚛 Mudflap Ad Creative Tracker</div><div class="hdr-s">Meta · Heavy 5+ Fleets · ${saving?'Saving…':'Auto-saved'} · ${ads.length} ads</div></div><button class="btn-p" onclick="oNew()">+ New Brief</button></div>
+${statsBar}${filters}
+<div class="con">${content}</div>
+${showForm?buildForm():''}`;
 }
 
-async function generate(){
-  const btn=document.getElementById('go-btn');
-  btn.disabled=true;
-  document.getElementById('progress-wrap').style.display='block';
-
-  for(let i=0;i<needsWork.length;i++){
-    const ad=needsWork[i];
-    const frac=`${i+1}/${needsWork.length}`;
-    document.getElementById('progress-label').textContent=`Processing: ${ad.concept}`;
-    document.getElementById('progress-frac').textContent=frac;
-    document.getElementById('bar').style.width=`${Math.round((i/needsWork.length)*100)}%`;
-    log(`Processing: ${ad.concept}…`);
-
-    try{
-      const sc=ad.scenes||[];
-      const ha=sc.find(s=>s.id==='ha');
-      const pr=sc.find(s=>s.id==='pr');
-      const ins=sc.find(s=>s.id==='ins');
-      const sol=sc.find(s=>s.id==='sol');
-      const ct=sc.find(s=>s.id==='ct');
-      const meta=ad.meta_copy||{};
-
-      const prompt=`You are a creative director writing Meta ad copy for Mudflap, a fuel savings app for heavy truck fleet operators (5+ trucks). You write short, punchy copy that speaks to operators who are skeptical, busy, and value real savings over marketing speak.
-
-AD CONTEXT:
-- Concept: ${ad.concept}
-- Core Insight: ${ad.core_insight||''}
-- Tone: ${ad.tone||'Direct / Authoritative'}
-- Funnel Stage: ${ad.funnel_stage||'Awareness'}
-- Hook A (0–2s, ~5 words): ${ha?.vo||''}
-- Problem (2–5s): ${pr?.vo||''}
-- Insight (5–8s): ${ins?.vo||''}
-- Solution (8–12s): ${sol?.vo||''}
-- CTA (12–15s): ${ct?.vo||''}
-
-Generate THREE things. Hook B and Hook C must test completely different emotions from Hook A and from each other. If Hook A is provocative, try empathetic or humorous. Each hook should be ~5 words max.
-
-For Primary Text: write copy that feels native to the Meta feed — not an ad headline. Max 125 chars. No hashtags. Pick the tone that best serves this specific concept and funnel stage.
-
-Respond ONLY with valid JSON, no markdown, no explanation:
-{"hookB":"...","hookC":"...","primaryText":"..."}`;
-
-      const res=await fetch('https://api.anthropic.com/v1/messages',{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({
-          model:'claude-sonnet-4-20250514',
-          max_tokens:500,
-          messages:[{role:'user',content:prompt}]
-        })
-      });
-
-      const data=await res.json();
-      const text=data.content?.find(b=>b.type==='text')?.text||'';
-      const clean=text.replace(/```json|```/g,'').trim();
-      const parsed=JSON.parse(clean);
-
-      const newScenes=sc.map(s=>{
-        if(s.id==='hb'&&!s.vo)return{...s,vo:parsed.hookB};
-        if(s.id==='hc'&&!s.vo)return{...s,vo:parsed.hookC};
-        return s;
-      });
-      const newMeta={...{primaryText:'',headline:'',description:'',displayUrl:''},...meta};
-      if(!newMeta.primaryText)newMeta.primaryText=parsed.primaryText;
-
-      await sb.from('ads').update({scenes:newScenes,meta_copy:newMeta,primary_text:newMeta.primaryText}).eq('id',ad.id);
-      log(`✓ ${ad.concept}`, 'success');
-
-    }catch(e){
-      log(`✗ ${ad.concept} — ${e.message}`, 'error');
-    }
-
-    await new Promise(r=>setTimeout(r,400));
-  }
-
-  document.getElementById('bar').style.width='100%';
-  document.getElementById('progress-label').textContent='All done!';
-  log('─────────────────────────────', 'info');
-  log('✓ All done! Reload your tracker to see the updates.', 'success');
-  btn.textContent='Done!';
+function card(a,showM){
+  const open=expIds.has(a.id),cs=COPY_S[a.format],hasSc=a.scenes&&a.scenes.some(s=>s.vo||s.prompt),hasMeta=cs&&a.metaCopy&&Object.values(a.metaCopy).some(Boolean),showP=showM||['Live','Winner'].includes(a.status);
+  return`<div class="card ${a.status==='Winner'?'win':''}"><div class="ch"><div class="ci"><div class="cpills"><span class="ct">${esc(a.concept||'Untitled')}</span>${spill(a.status)}${a.funnelStage?`<span class="pill ps">${a.funnelStage}</span>`:''} ${a.format?`<span class="pill pf">${a.format}</span>`:''} ${a.tone?`<span class="pill ${toneClass(a.tone)}">${a.tone}</span>`:''}</div>${a.coreInsight?`<div class="cins">${esc(a.coreInsight)}</div>`:''} ${a.notes?`<div class="cnot">${esc(a.notes)}</div>`:''}</div>
+<div class="ca">
+<select onchange="doStatus('${a.id}',this.value)">${ALL_ST.map(s=>`<option ${a.status===s?'selected':''}>${s}</option>`).join('')}</select>
+<button onclick="doDupe('${a.id}')" style="font-size:11px;color:#7c3aed;border:1px solid #e9d5ff;background:white;border-radius:6px;padding:3px 7px;cursor:pointer">⎘</button>
+<button onclick="oEdit('${a.id}')" style="font-size:11px;color:#2563eb;border:1px solid #bfdbfe;background:white;border-radius:6px;padding:3px 7px;cursor:pointer">Edit</button>
+<button onclick="togExp('${a.id}')" style="font-size:11px;color:#6b7280;border:1px solid #e5e7eb;background:white;border-radius:6px;padding:3px 7px;cursor:pointer">${open?'▲':'▼'}</button>
+<button onclick="if(confirm('Delete?'))doDelete('${a.id}')" style="font-size:11px;color:#ef4444;border:1px solid #fecaca;background:white;border-radius:6px;padding:3px 7px;cursor:pointer">✕</button>
+</div></div>
+${open?`<div class="cb">
+<div class="cm">${[['Job',a.job],['Production',a.productionMethod],['Visual Style',a.visualStyle],['Hypothesis',a.hypothesis]].filter(([,v])=>v).map(([l,v])=>`<div><span class="ml">${l}: </span><span class="mv">${esc(v)}</span></div>`).join('')}</div>
+${hasSc?`<div><div class="st">Script Direction</div>${a.scenes.filter(s=>s.vo||s.prompt).map(s=>`<div class="sb"><div style="font-weight:600;color:#374151;margin-bottom:4px">${s.label} <span style="color:#9ca3af;font-weight:400">(${s.timing})</span></div>${s.vo?`<div class="sr"><div class="srl"><span>VO</span><button class="cpb" onclick="cpTxt(this,'${ea(s.vo)}')">Copy</button></div><div style="color:#374151;line-height:1.5;white-space:pre-wrap">${esc(s.vo)}</div></div>`:''} ${s.prompt?`<div class="sr"><div class="srl"><span>AI Prompt</span><button class="cpb" onclick="cpTxt(this,'${ea(s.prompt)}')">Copy</button></div><div style="color:#6b7280;line-height:1.5;white-space:pre-wrap">${esc(s.prompt)}</div></div>`:''}</div>`).join('')}</div>`:''}
+${hasMeta?`<div><div class="st">Meta Ad Copy (${a.format})</div>${cs.f.map(f=>a.metaCopy[f.k]?`<div class="mr"><div><span class="ml">${f.l}: </span><span class="mv">${esc(a.metaCopy[f.k])}</span></div><button class="cpb" onclick="cpTxt(this,'${ea(a.metaCopy[f.k])}')">Copy</button></div>`:''  ).join('')}</div>`:''}
+${showP?`<div><div class="st">Performance</div><div class="pg">${[['thumbStop','Thumb-Stop %'],['viewRate','3s View %'],['completionRate','Completion %'],['ctr','CTR %'],['cpa','CPA ($)'],['notes','Notes']].map(([k,l])=>`<div><label>${l}</label><input value="${esc((a.metrics&&a.metrics[k])||'')}" onchange="doMetric('${a.id}','${k}',this.value)"></div>`).join('')}</div></div>`:''}
+</div>`:''}
+</div>`;
 }
 
-init();
+function buildForm(){
+  const cs=form.format?COPY_S[form.format]:null;
+  const ip=['In Copy Production','Needs Copy Review','In Design','Live','Winner','Archive'].includes(form.status);
+  return`<div class="ov" onclick="cForm()"><div class="mod" onclick="event.stopPropagation()">
+<div class="mh"><div><div class="mt">${editId?'Edit Brief':'New Creative Brief'}</div><div class="ms">Mudflap · Meta · Heavy 5+ Fleets</div></div><button class="mc" onclick="cForm()">✕</button></div>
+<div class="mb">
+<div><div class="fst">Overview</div>
+<div class="fg"><label class="fl">Concept Name *</label><input class="fi" id="fc" value="${esc(form.concept)}" placeholder="e.g. The Confession"></div>
+<div class="fg"><label class="fl">Core Insight *</label><textarea class="fa" id="fi" rows="2" placeholder="The one truth this ad is built on…">${esc(form.coreInsight)}</textarea></div>
+<div class="fg"><label class="fl">Hypothesis</label><textarea class="fa" id="fh" rows="2" placeholder="Why will this concept move a Heavy 5+ fleet operator?">${esc(form.hypothesis)}</textarea></div>
+</div>
+<div><div class="fst">Funnel</div><div class="fr">
+<div><label class="fl">Funnel Stage</label><select class="fs" id="ffs" onchange="fCh('funnelStage',this.value)"><option value="">Select…</option>${STAGES.map(s=>`<option ${form.funnelStage===s?'selected':''}>${s}</option>`).join('')}</select>${form.funnelStage&&form.funnelStage!=='TBD'?`<div class="fh">${STAGE_D[form.funnelStage]}</div>`:''}</div>
+<div><label class="fl">Job To Be Done</label><select class="fs" id="fjob"><option value="">Select…</option>${JOBS.map(j=>`<option ${form.job===j?'selected':''}>${j}</option>`).join('')}</select></div></div></div>
+<div><div class="fst">Format & Style</div>
+<div class="fg"><label class="fl">Format *</label><select class="fs" id="ffmt" onchange="fCh('format',this.value)">${FMTS.map(f=>`<option ${form.format===f?'selected':''}>${f}</option>`).join('')}</select>${form.format?`<div class="fh">${FMT_D[form.format]}</div>`:''}</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">${[[TONES,'Tone','tone','ftn'],[PRODS,'Production Method','productionMethod','fpm'],[VISUALS,'Visual Style','visualStyle','fvs']].map(([opts,label,key,id])=>`<div><label class="fl">${label}</label><select class="fs" id="${id}" onchange="fCh('${key}',this.value)"><option value="">Select…</option>${opts.map(t=>`<option value="${t.v}" ${form[key]===t.v?'selected':''}>${t.v}</option>`).join('')}</select>${form[key]&&form[key]!=='TBD'?`<div class="fh" style="font-size:11px">${opts.find(t=>t.v===form[key])?.d||''}</div>`:''}</div>`).join('')}</div></div>
+<div><div class="fst">Notes</div><textarea class="fa" id="fnot" rows="2" placeholder="Brief / Pillar group, talent, locations, deadlines…">${esc(form.notes)}</textarea></div>
+${!ip?`<div class="lk"><div class="lt">🔒 Script Direction & Ad Copy</div><div class="ls">Unlocks when status moves to <strong>In Copy Production</strong> or beyond.</div></div>`:`
+<div><div class="fst">Script Direction</div>${form.scenes.map((sc,i)=>`<div class="scf"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:13px;font-weight:700;color:#111827">${sc.label}</span><span style="font-size:11px;color:#9ca3af;background:white;border:1px solid #e5e7eb;border-radius:99px;padding:1px 7px">${sc.timing}</span><span class="wc">${sc.wc}</span></div>
+<div class="fg"><div style="display:flex;justify-content:space-between;margin-bottom:3px"><label class="fl" style="margin:0;font-size:11px;color:#6b7280">On-screen text / VO</label>${sc.vo?`<button class="cpb" onclick="cpTxt(this,'${ea(sc.vo)}')">Copy</button>`:''}</div><textarea class="fa" style="background:white" rows="2" onchange="updSc(${i},'vo',this.value)">${esc(sc.vo)}</textarea></div>
+<div style="margin:0"><div style="display:flex;justify-content:space-between;margin-bottom:3px"><label class="fl" style="margin:0;font-size:11px;color:#6b7280">AI Prompt</label>${sc.prompt?`<button class="cpb" onclick="cpTxt(this,'${ea(sc.prompt)}')">Copy</button>`:''}</div><textarea class="fa" style="background:white" rows="2" onchange="updSc(${i},'prompt',this.value)">${esc(sc.prompt)}</textarea></div></div>`).join('')}</div>
+<div><div class="fst">Meta Ad Copy</div>${cs?`<div class="csp"><div class="cspt">${form.format} — Copy Spec</div><div class="cspn">${cs.note}</div></div>${cs.f.map(f=>{const val=form.metaCopy[f.k]||'',over=val.length>f.lim;return`<div class="fg"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px"><label class="fl" style="margin:0">${f.l}</label><div style="display:flex;gap:8px;align-items:center">${val?`<button class="cpb" onclick="cpTxt(this,'${ea(val)}')">Copy</button>`:''}<span class="cc ${over?'co':'ck'}">${val.length}/${f.lim}</span></div></div>${f.k==='primaryText'?`<textarea class="fa ${over?'br':''}" rows="3" onchange="updM('${f.k}',this.value)">${esc(val)}</textarea>`:`<input class="fi ${over?'br':''}" value="${esc(val)}" onchange="updM('${f.k}',this.value)">`}</div>`;}).join('')}`:''}  </div>`}
+</div>
+<div class="mf"><button style="font-size:13px;color:#9ca3af;background:none;border:none;cursor:pointer" onclick="cForm()">Cancel</button><button class="btn-p" onclick="subForm()">${saving?'Saving…':'Save Brief'}</button></div>
+</div></div>`;
+}
+
+window.setVTab=k=>{viewTab=k;render();};
+window.setSearch=v=>{search=v;render();};
+window.setStage=v=>{fStage=v;render();};
+window.setGroup=v=>{fGroup=v;render();};
+window.clrFlt=()=>{search='';fStage='All';fGroup='All';render();};
+window.togExp=id=>{expIds.has(id)?expIds.delete(id):expIds.add(id);render();};
+window.oNew=()=>{form=blankForm();editId=null;showForm=true;render();};
+window.oEdit=id=>{const a=ads.find(x=>x.id===id);if(!a)return;form={id:a.id,concept:a.concept||'',funnelStage:a.funnelStage||'',job:a.job||'',format:a.format||'Reel',tone:a.tone||'',productionMethod:a.productionMethod||'',visualStyle:a.visualStyle||'',week:'',status:a.status||'Briefs',coreInsight:a.coreInsight||'',hypothesis:a.hypothesis||'',notes:a.notes||'',metaCopy:{...{primaryText:'',headline:'',description:'',displayUrl:''},...(a.metaCopy||{})},scenes:(a.scenes||blankScenes()).map(s=>({...s,wc:SCENE_DEFS.find(d=>d.id===s.id)?.wc||''})),metrics:{...{thumbStop:'',viewRate:'',completionRate:'',ctr:'',cpa:'',notes:''},...(a.metrics||{})}};editId=id;showForm=true;render();};
+window.cForm=()=>{showForm=false;render();};
+window.fCh=(k,v)=>{form[k]=v;render();};
+window.updSc=(i,f,v)=>{form.scenes[i][f]=v;};
+window.updM=(k,v)=>{form.metaCopy[k]=v;};
+window.cpTxt=(btn,txt)=>{navigator.clipboard.writeText(txt.replace(/\\n/g,'\n'));btn.textContent='✓';btn.classList.add('ok');setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('ok');},1400);};
+window.subForm=async()=>{
+  const concept=document.getElementById('fc')?.value.trim();
+  if(!concept){toast('Concept name is required');return;}
+  form.concept=concept;
+  form.coreInsight=document.getElementById('fi')?.value||'';
+  form.hypothesis=document.getElementById('fh')?.value||'';
+  form.status=form.status||'Briefs';
+  form.funnelStage=document.getElementById('ffs')?.value||'';
+  form.job=document.getElementById('fjob')?.value||'';
+  form.format=document.getElementById('ffmt')?.value||'Reel';
+  form.tone=document.getElementById('ftn')?.value||'';
+  form.productionMethod=document.getElementById('fpm')?.value||'';
+  form.visualStyle=document.getElementById('fvs')?.value||'';
+  form.notes=document.getElementById('fnot')?.value||'';
+  document.querySelectorAll('.scf').forEach((el,i)=>{const tas=el.querySelectorAll('textarea');if(tas[0])form.scenes[i].vo=tas[0].value;if(tas[1])form.scenes[i].prompt=tas[1].value;});
+  saving=true;render();
+  const ok=await saveAd({...form,id:editId||form.id});
+  saving=false;
+  if(ok){showForm=false;toast('Saved!');}
+  render();
+};
+
+load();
 </script>
 </body>
 </html>
