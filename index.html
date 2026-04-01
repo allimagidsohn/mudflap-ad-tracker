@@ -107,13 +107,13 @@ const VISUALS=[{v:'Cinematic',d:'Polished, high-production. Looks like a TV spot
 const STAGES=['Awareness','Consideration','Intent','Retargeting','Usage/Expansion'];
 const JOBS=['Interrupt','Reframe','Prove','Convert','Reinforce','Validate'];
 const FMTS=['Reel','Carousel','Static','Video (Feed)'];
-const ALL_ST=['Upcoming','In Copy Production','Needs Copy Review','In Design','Live','Winner','Archive'];
+const ALL_ST=['Briefs','In Copy Production','Needs Copy Review','In Design','Live','Archive'];
 const GROUPS=['Brief 1 — Self-Aware AI','Brief 2 — Lifestyle / Chaos','Brief 3 — Math Motion','Brief 4 — Inertia / Habits','Brief 5 — Health / Peace of Mind','Brief 6 — Absurd Fees','Brief 7 — Customer Support','Pillar 1 — Money / Business','Pillar 2 — Life / Identity','Pillar 3 — Debate','Pillar 4 — Trucks and Tech','Pillar 5 — Health & Wellbeing','Pillar 6 — Roadcraft','Pillar 7 — Status / Respect','Claims Ads','Doc 1'];
 const STAGE_D={Awareness:"They have a pain but haven't done anything about it. Job: interrupt and make the problem feel real.",Consideration:"They're thinking 'maybe there's a better way.' Job: shift their thinking.",Intent:'Actively comparing options. Job: prove Mudflap is best and remove doubt.',Retargeting:"Seen the ads but haven't signed up. Job: nudge over the finish line.",'Usage/Expansion':'Already using Mudflap. Job: validate their decision and build identity.'};
 const FMT_D={Reel:'Short, punchy videos. Top of funnel, grab attention cold. Hook must land in 1 second.','Video (Feed)':'Slightly longer. Build trust with testimonials or storytelling.',Carousel:'Swipeable cards. Walk someone through a logical argument step by step.',Static:"Simple, cheap, fast. Best for reminding people who've already seen the brand."};
 const COPY_S={Reel:{note:'Reels run full-screen. Only Primary Text appears in feed entry points.',f:[{k:'primaryText',l:'Primary Text',lim:125}]},'Video (Feed)':{note:'Feed video shows Primary Text above, Headline + Description below.',f:[{k:'primaryText',l:'Primary Text',lim:125},{k:'headline',l:'Headline',lim:40},{k:'description',l:'Description',lim:30}]},Static:{note:'Image ads support the full suite of copy fields.',f:[{k:'primaryText',l:'Primary Text',lim:125},{k:'headline',l:'Headline',lim:40},{k:'description',l:'Description',lim:30},{k:'displayUrl',l:'Display URL',lim:255}]},Carousel:{note:'Overall Primary Text at top, then each card has its own Headline and Description.',f:[{k:'primaryText',l:'Primary Text',lim:125},{k:'headline',l:'Per-Card Headline',lim:40},{k:'description',l:'Per-Card Description',lim:20},{k:'displayUrl',l:'Display URL',lim:255}]}};
-const SC_BG={Upcoming:'#dbeafe','In Copy Production':'#fef9c3','Needs Copy Review':'#ffedd5','In Design':'#fce7f3',Live:'#dcfce7',Winner:'#ede9fe',Archive:'#f3f4f6'};
-const SC_TX={Upcoming:'#1e40af','In Copy Production':'#713f12','Needs Copy Review':'#7c2d12','In Design':'#831843',Live:'#14532d',Winner:'#4c1d95',Archive:'#374151'};
+const SC_BG={Briefs:'#dbeafe','In Copy Production':'#fef9c3','Needs Copy Review':'#ffedd5','In Design':'#fce7f3',Live:'#dcfce7',Archive:'#f3f4f6'};
+const SC_TX={Briefs:'#1e40af','In Copy Production':'#713f12','Needs Copy Review':'#7c2d12','In Design':'#831843',Live:'#14532d',Archive:'#374151'};
 const SCENE_DEFS=[{id:'ha',label:'Scene 1 — Hook A',timing:'0–2s'},{id:'hb',label:'Scene 1 — Hook B',timing:'0–2s'},{id:'hc',label:'Scene 1 — Hook C',timing:'0–2s'},{id:'pr',label:'Scene 2 — Problem',timing:'2–5s'},{id:'ins',label:'Scene 3 — Insight',timing:'5–8s'},{id:'sol',label:'Scene 4 — Solution',timing:'8–12s'},{id:'ct',label:'Scene 5 — CTA',timing:'12–15s'}];
 
 let ads=[],viewTab='All',search='',fStage='All',fGroup='All',sortCol='concept',sortDir='asc';
@@ -162,9 +162,9 @@ function render(){document.getElementById('app').innerHTML=html();}
 
 function html(){
   const byStatus=s=>ads.filter(a=>a.status===s);
-  const STAT_COLORS={Upcoming:'#1e40af','In Copy Production':'#713f12','Needs Copy Review':'#7c2d12','In Design':'#831843',Live:'#14532d',Winner:'#4c1d95','Moved to Archive':'#6b7280'};
+  const STAT_COLORS={Briefs:'#1e40af','In Copy Production':'#713f12','Needs Copy Review':'#7c2d12','In Design':'#831843',Live:'#14532d',Archive:'#374151'};
 
-  const statsBar=`<div class="stats">${[{l:'All',k:'All',c:'#111827'},...ALL_ST.map(s=>({l:s,k:s,c:STAT_COLORS[s]})),{l:'Table',k:'__table',c:'#6b7280'}].map(s=>`<div class="stat" onclick="setVTab('${s.k}')" style="cursor:pointer;${viewTab===s.k?'border-color:'+s.c+';box-shadow:0 0 0 2px '+s.c+'22':''}""><div class="sv" style="color:${s.c}">${s.k==='All'?ads.length:s.k==='__table'?ads.length:byStatus(s.k).length}</div><div class="sl">${s.l}</div></div>`).join('')}</div>`;
+  const statsBar=`<div class="stats">${[...ALL_ST.map(s=>({l:s,k:s,c:STAT_COLORS[s]})),{l:'All',k:'All',c:'#111827'}].map(s=>`<div class="stat" onclick="setVTab('${s.k}')" style="cursor:pointer;${viewTab===s.k?'border-color:'+s.c+';box-shadow:0 0 0 2px '+s.c+'22':''}"><div class="sv" style="color:${s.c}">${s.k==='All'?ads.length:byStatus(s.k).length}</div><div class="sl">${s.l}</div></div>`).join('')}</div>`;
 
   const tabBar='';
 
