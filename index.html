@@ -116,7 +116,7 @@ const SC_BG={Upcoming:'#dbeafe','In Copy Production':'#fef9c3','Needs Copy Revie
 const SC_TX={Upcoming:'#1e40af','In Copy Production':'#713f12','Needs Copy Review':'#7c2d12','In Design':'#831843',Live:'#14532d',Winner:'#4c1d95','Moved to Archive':'#374151'};
 const SCENE_DEFS=[{id:'ha',label:'Scene 1 — Hook A',timing:'0–2s'},{id:'hb',label:'Scene 1 — Hook B',timing:'0–2s'},{id:'hc',label:'Scene 1 — Hook C',timing:'0–2s'},{id:'pr',label:'Scene 2 — Problem',timing:'2–5s'},{id:'ins',label:'Scene 3 — Insight',timing:'5–8s'},{id:'sol',label:'Scene 4 — Solution',timing:'8–12s'},{id:'ct',label:'Scene 5 — CTA',timing:'12–15s'}];
 
-let ads=[],viewTab=0,search='',fStage='All',fGroup='All',sortCol='concept',sortDir='asc';
+let ads=[],viewTab='All',search='',fStage='All',fGroup='All',sortCol='concept',sortDir='asc';
 let expIds=new Set(),showForm=false,editId=null,saving=false;
 
 function blankScenes(){return SCENE_DEFS.map(s=>({...s,vo:'',prompt:''}));}
@@ -166,14 +166,16 @@ function html(){
 
   const statsBar=`<div class="stats">${ALL_ST.map(s=>`<div class="stat"><div class="sv" style="color:${STAT_COLORS[s]}">${byStatus(s).length}</div><div class="sl">${s}</div></div>`).join('')}</div>`;
 
-  const TABS=[{l:'📋 All Ads',cnt:ads.length},{l:'📊 Table',cnt:ads.length}];
-  const tabBar=`<div class="tabs" style="margin-top:14px">${TABS.map((t,i)=>`<button class="tab ${viewTab===i?'on':''}" onclick="setVTab(${i})">${t.l}<span class="tc">${t.cnt}</span></button>`).join('')}</div>`;
+  const TAB_ITEMS=[{l:'All',k:'All'},...ALL_ST.map(s=>({l:s,k:s})),{l:'📊 Table',k:'__table'}];
+  const tabBar=`<div class="tabs" style="margin-top:14px;overflow-x:auto">${TAB_ITEMS.map(t=>`<button class="tab ${viewTab===t.k?'on':''}" onclick="setVTab('${t.k}')">${t.l}${t.k!=='__table'?`<span class="tc">${t.k==='All'?ads.length:byStatus(t.k).length}</span>`:''}</button>`).join('')}</div>`;
 
   const filters=`<div class="flt"><input value="${esc(search)}" oninput="setSearch(this.value)" placeholder="Search…"><select onchange="setStage(this.value)"><option value="All" ${fStage==='All'?'selected':''}>All Stages</option>${STAGES.map(s=>`<option ${fStage===s?'selected':''}>${s}</option>`).join('')}</select><select onchange="setGroup(this.value)" style="width:210px"><option value="All" ${fGroup==='All'?'selected':''}>All Briefs / Pillars</option>${GROUPS.map(g=>`<option value="${g}" ${fGroup===g?'selected':''}>${g}</option>`).join('')}</select>${(search||fStage!=='All'||fGroup!=='All')?'<button class="bcl" onclick="clrFlt()">Clear</button>':''}</div>`;
 
   let content='';
-  if(viewTab===0){
-    content=ALL_ST.map(s=>{
+  if(viewTab==='__table'){
+  } else {
+    const statusesToShow = viewTab==='All' ? ALL_ST : [viewTab];
+    content=statusesToShow.map(s=>{
       const grp=filt(byStatus(s));
       const showPerf=['Live','Winner'].includes(s);
       return`<div class="grp">
@@ -181,8 +183,8 @@ function html(){
         ${grp.length?grp.map(a=>card(a,showPerf)).join(''):`<div class="empty-grp">No ads in this stage</div>`}
       </div>`;
     }).join('');
-  } else {
-    const rows=filt(srt(ads));
+  }
+  if(viewTab==='__table'){const rows=filt(srt(ads));
     content=`<div class="tw"><p style="font-size:12px;color:#9ca3af;margin-bottom:12px">All ${ads.length} ads</p><table><thead><tr>${[['concept','Concept'],['funnelStage','Stage'],['tone','Tone'],['status','Status'],['notes','Brief']].map(([c,l])=>`<th onclick="tSort('${c}')">${l}${sortCol===c?sortDir==='asc'?' ↑':' ↓':''}</th>`).join('')}<th>Actions</th></tr></thead><tbody>${rows.map(a=>`<tr><td style="font-weight:500;color:#111827;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(a.concept||'—')}</td><td><span class="pill ps">${a.funnelStage||'—'}</span></td><td style="color:#6b7280">${a.tone||'—'}</td><td>${spill(a.status)}</td><td style="color:#9ca3af;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.notes||'—'}</td><td style="white-space:nowrap"><button onclick="oEdit('${a.id}')" style="font-size:11px;color:#2563eb;background:none;border:none;cursor:pointer;margin-right:6px">Edit</button><button onclick="doDupe('${a.id}')" style="font-size:11px;color:#7c3aed;background:none;border:none;cursor:pointer;margin-right:6px">Dupe</button><button onclick="if(confirm('Delete?'))doDelete('${a.id}')" style="font-size:11px;color:#ef4444;background:none;border:none;cursor:pointer">✕</button></td></tr>`).join('')}</tbody></table></div>`;
   }
 
@@ -239,7 +241,7 @@ ${!ip?`<div class="lk"><div class="lt">🔒 Script Direction & Ad Copy</div><div
 </div></div>`;
 }
 
-window.setVTab=i=>{viewTab=i;render();};
+window.setVTab=k=>{viewTab=k;render()};
 window.setSearch=v=>{search=v;render();};
 window.setStage=v=>{fStage=v;render();};
 window.setGroup=v=>{fGroup=v;render();};
