@@ -127,6 +127,7 @@ function blankForm(){return{concept:'',funnelStage:'',job:'',format:'Reel',tone:
 let form=blankForm();
 
 function toneClass(t){const m={'Humor':'pt-humor','Empathetic':'pt-empathetic','Provocative':'pt-provocative','Direct / Authoritative':'pt-direct','TBD':'pt-tbd'};return m[t]||'pt-tbd';}
+window.toneClass=toneClass;
 function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function ea(s){return(s||'').replace(/'/g,'&#39;').replace(/\n/g,'\\n');}
 function spill(s){const bg=SC_BG[s]||'#f3f4f6',tx=SC_TX[s]||'#374151';return`<span class="pill" style="background:${bg};color:${tx};border:1px solid ${tx}33">${s}</span>`;}
