@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -126,7 +126,7 @@ function blankScenes(){return SCENE_DEFS.map(s=>({...s,vo:'',prompt:''}));}
 function blankForm(){return{concept:'',funnelStage:'',job:'',format:'Reel',tone:'',productionMethod:'',visualStyle:'',status:'Briefs',coreInsight:'',hypothesis:'',notes:'',metaCopy:{primaryText:'',headline:'',description:'',displayUrl:''},scenes:blankScenes(),metrics:{thumbStop:'',viewRate:'',completionRate:'',ctr:'',cpa:'',notes:''}};}
 let form=blankForm();
 
-const TONE_CLASSES={'Humor':'pt-humor','Empathetic':'pt-empathetic','Provocative':'pt-provocative','Direct / Authoritative':'pt-direct','TBD':'pt-tbd'};
+const TONE_STYLES={'Humor':'background:#fef9c3;color:#713f12','Empathetic':'background:#dbeafe;color:#1e40af','Provocative':'background:#fce7f3;color:#831843','Direct / Authoritative':'background:#dcfce7;color:#14532d','TBD':'background:#f3f4f6;color:#6b7280'};
 function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function ea(s){return(s||'').replace(/'/g,'&#39;').replace(/\n/g,'\\n');}
 function spill(s){const bg=SC_BG[s]||'#f3f4f6',tx=SC_TX[s]||'#374151';return`<span class="pill" style="background:${bg};color:${tx};border:1px solid ${tx}33">${s}</span>`;}
@@ -181,7 +181,7 @@ ${showForm?buildForm():''}`;
 
 function card(a,showM){
   const open=expIds.has(a.id),cs=COPY_S[a.format],hasSc=a.scenes&&a.scenes.some(s=>s.vo||s.prompt),hasMeta=cs&&a.metaCopy&&Object.values(a.metaCopy).some(Boolean),showP=showM||['Live','Winner'].includes(a.status);
-  return`<div class="card ${a.status==='Winner'?'win':''}"><div class="ch"><div class="ci"><div class="cpills"><span class="ct">${esc(a.concept||'Untitled')}</span>${spill(a.status)}${a.funnelStage?`<span class="pill ps">${a.funnelStage}</span>`:''} ${a.format?`<span class="pill pf">${a.format}</span>`:''} ${a.tone?`<span class="pill ${TONE_CLASSES[a.tone]||'pt-tbd'}">${a.tone}</span>`:''}</div>${a.coreInsight?`<div class="cins">${esc(a.coreInsight)}</div>`:''} ${a.notes?`<div class="cnot">${esc(a.notes)}</div>`:''}</div>
+  return`<div class="card ${a.status==='Winner'?'win':''}"><div class="ch"><div class="ci"><div class="cpills"><span class="ct">${esc(a.concept||'Untitled')}</span>${spill(a.status)}${a.funnelStage?`<span class="pill ps">${a.funnelStage}</span>`:''} ${a.format?`<span class="pill pf">${a.format}</span>`:''} ${a.tone?`<span class="pill" style="${TONE_STYLES[a.tone]||'background:#f3f4f6;color:#6b7280'}">${a.tone}</span>`:''}</div>${a.coreInsight?`<div class="cins">${esc(a.coreInsight)}</div>`:''} ${a.notes?`<div class="cnot">${esc(a.notes)}</div>`:''}</div>
 <div class="ca">
 <select onchange="doStatus('${a.id}',this.value)">${ALL_ST.map(s=>`<option ${a.status===s?'selected':''}>${s}</option>`).join('')}</select>
 <button onclick="doDupe('${a.id}')" style="font-size:11px;color:#7c3aed;border:1px solid #e9d5ff;background:white;border-radius:6px;padding:3px 7px;cursor:pointer">⎘</button>
