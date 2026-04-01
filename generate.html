@@ -182,7 +182,7 @@ ${showForm?buildForm():''}`;
 
 function card(a,showM){
   const open=expIds.has(a.id),cs=COPY_S[a.format],hasSc=a.scenes&&a.scenes.some(s=>s.vo||s.prompt),hasMeta=cs&&a.metaCopy&&Object.values(a.metaCopy).some(Boolean),showP=showM||['Live','Winner'].includes(a.status);
-  return`<div class="card ${a.status==='Winner'?'win':''}"><div class="ch"><div class="ci"><div class="cpills"><span class="ct">${esc(a.concept||'Untitled')}</span>${spill(a.status)}${a.funnelStage?`<span class="pill ps">${a.funnelStage}</span>`:''} ${a.format?`<span class="pill pf">${a.format}</span>`:''} ${a.tone?`<span class="pill ${toneClass(a.tone)}">${a.tone}</span>`:''}</div>${a.coreInsight?`<div class="cins">${esc(a.coreInsight)}</div>`:''} ${a.notes?`<div class="cnot">${esc(a.notes)}</div>`:''}</div>
+  return`<div class="card ${a.status==='Winner'?'win':''}"><div class="ch"><div class="ci"><div class="cpills"><span class="ct">${esc(a.concept||'Untitled')}</span>${spill(a.status)}${a.funnelStage?`<span class="pill ps">${a.funnelStage}</span>`:''} ${a.format?`<span class="pill pf">${a.format}</span>`:''} ${a.tone?`<span class="pill ${ {'Humor':'pt-humor','Empathetic':'pt-empathetic','Provocative':'pt-provocative','Direct / Authoritative':'pt-direct'}[a.tone]||'pt-tbd' }">${a.tone}</span>`:''}</div>${a.coreInsight?`<div class="cins">${esc(a.coreInsight)}</div>`:''} ${a.notes?`<div class="cnot">${esc(a.notes)}</div>`:''}</div>
 <div class="ca">
 <select onchange="doStatus('${a.id}',this.value)">${ALL_ST.map(s=>`<option ${a.status===s?'selected':''}>${s}</option>`).join('')}</select>
 <button onclick="doDupe('${a.id}')" style="font-size:11px;color:#7c3aed;border:1px solid #e9d5ff;background:white;border-radius:6px;padding:3px 7px;cursor:pointer">⎘</button>
