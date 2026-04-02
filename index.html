@@ -101,14 +101,14 @@ const VISUALS=[{v:'Cinematic',d:'Polished, high-production. Looks like a TV spot
 const STAGES=['Awareness','Consideration','Intent','Retargeting','Usage/Expansion','TBD'];
 const JOBS=['Interrupt','Reframe','Prove','Convert','Reinforce','Validate','TBD'];
 const FMTS=['Reel','Carousel','Static','Video (Feed)'];
-const ALL_ST=['Briefs','In Copy Production','Needs Copy Review','In Design','Live','Winner','Archive'];
+const ALL_ST=['Briefs','Editing','Review / Allocation','In Design','Live','Winner','Archive'];
 const GROUPS=['Brief 1 — Self-Aware AI','Brief 2 — Lifestyle / Chaos','Brief 3 — Math Motion','Brief 4 — Inertia / Habits','Brief 5 — Health / Peace of Mind','Brief 6 — Absurd Fees','Brief 7 — Customer Support','Pillar 1 — Money / Business','Pillar 2 — Life / Identity','Pillar 3 — Debate','Pillar 4 — Trucks and Tech','Pillar 5 — Health & Wellbeing','Pillar 6 — Roadcraft','Pillar 7 — Status / Respect','Claims Ads','Doc 1'];
 const STAGE_D={Awareness:"They have a pain but haven't done anything about it. Job: interrupt and make the problem feel real.",Consideration:"They're thinking 'maybe there's a better way.' Job: shift their thinking.",Intent:'Actively comparing options. Job: prove Mudflap is best and remove doubt.',Retargeting:"Seen the ads but haven't signed up. Job: nudge over the finish line.",'Usage/Expansion':'Already using Mudflap. Job: validate their decision and build identity.',TBD:''};
 const FMT_D={Reel:'Short, punchy videos. Top of funnel, grab attention cold. Hook must land in 1 second.','Video (Feed)':'Slightly longer. Build trust with testimonials or storytelling.',Carousel:'Swipeable cards. Walk someone through a logical argument step by step.',Static:"Simple, cheap, fast. Best for reminding people who've already seen the brand."};
 const COPY_S={Reel:{note:'Reels run full-screen. Only Primary Text appears in feed entry points.',f:[{k:'primaryText',l:'Primary Text',lim:125}]},'Video (Feed)':{note:'Feed video shows Primary Text above, Headline + Description below.',f:[{k:'primaryText',l:'Primary Text',lim:125},{k:'headline',l:'Headline',lim:40},{k:'description',l:'Description',lim:30}]},Static:{note:'Image ads support the full suite of copy fields.',f:[{k:'primaryText',l:'Primary Text',lim:125},{k:'headline',l:'Headline',lim:40},{k:'description',l:'Description',lim:30},{k:'displayUrl',l:'Display URL',lim:255}]},Carousel:{note:'Overall Primary Text at top, then each card has its own Headline and Description.',f:[{k:'primaryText',l:'Primary Text',lim:125},{k:'headline',l:'Per-Card Headline',lim:40},{k:'description',l:'Per-Card Description',lim:20},{k:'displayUrl',l:'Display URL',lim:255}]}};
-const SC_BG={Briefs:'#dbeafe','In Copy Production':'#fef9c3','Needs Copy Review':'#ffedd5','In Design':'#fce7f3',Live:'#dcfce7',Winner:'#ede9fe',Archive:'#f3f4f6'};
-const SC_TX={Briefs:'#1e40af','In Copy Production':'#713f12','Needs Copy Review':'#7c2d12','In Design':'#831843',Live:'#14532d',Winner:'#4c1d95',Archive:'#374151'};
-const STAT_COLORS={Briefs:'#1e40af','In Copy Production':'#713f12','Needs Copy Review':'#7c2d12','In Design':'#831843',Live:'#14532d',Winner:'#4c1d95',Archive:'#374151'};
+const SC_BG={Briefs:'#dbeafe',Editing:'#fef9c3','Review / Allocation':'#ffedd5','In Design':'#fce7f3',Live:'#dcfce7',Winner:'#ede9fe',Archive:'#f3f4f6'};
+const SC_TX={Briefs:'#1e40af',Editing:'#713f12','Review / Allocation':'#7c2d12','In Design':'#831843',Live:'#14532d',Winner:'#4c1d95',Archive:'#374151'};
+const STAT_COLORS={Briefs:'#1e40af',Editing:'#713f12','Review / Allocation':'#7c2d12','In Design':'#831843',Live:'#14532d',Winner:'#4c1d95',Archive:'#374151'};
 const SCENE_DEFS=[
   {id:'ha',label:'Scene 1 — Hook A',timing:'0–2s',wc:'~5 words'},
   {id:'hb',label:'Scene 1 — Hook B',timing:'0–2s',wc:'~5 words'},
@@ -200,7 +200,7 @@ ${showP?`<div><div class="st">Performance</div><div class="pg">${[['thumbStop','
 
 function buildForm(){
   const cs=form.format?COPY_S[form.format]:null;
-  const ip=['In Copy Production','Needs Copy Review','In Design','Live','Winner','Archive'].includes(form.status);
+  const ip=['Editing','Review / Allocation','In Design','Live','Winner','Archive'].includes(form.status);
   return`<div class="ov" onclick="cForm()"><div class="mod" onclick="event.stopPropagation()">
 <div class="mh"><div><div class="mt">${editId?'Edit Brief':'New Creative Brief'}</div><div class="ms">Mudflap · Meta · Heavy 5+ Fleets</div></div><button class="mc" onclick="cForm()">✕</button></div>
 <div class="mb">
@@ -256,10 +256,70 @@ window.subForm=async()=>{
   form.visualStyle=document.getElementById('fvs')?.value||'';
   form.notes=document.getElementById('fnot')?.value||'';
   document.querySelectorAll('.scf').forEach((el,i)=>{const tas=el.querySelectorAll('textarea');if(tas[0])form.scenes[i].vo=tas[0].value;if(tas[1])form.scenes[i].prompt=tas[1].value;});
+
+  // Auto-generate copy for new briefs
+  const isNew=!editId;
+  const hasContent=form.scenes.some(s=>s.vo||s.prompt);
+  if(isNew&&!hasContent){
+    saving=true;
+    toast('Generating copy…');
+    render();
+    try{
+      const prompt=`You are a creative director writing Meta ad scripts for Mudflap, a fuel savings app for heavy truck fleet operators (5+ trucks). Write short, punchy, direct copy that speaks to operators who are skeptical, busy, and value real savings over marketing speak.
+
+BRIEF:
+- Concept: ${form.concept}
+- Core Insight: ${form.coreInsight||''}
+- Tone: ${form.tone||'Direct / Authoritative'}
+- Funnel Stage: ${form.funnelStage||'Awareness'}
+- Job To Be Done: ${form.job||'Interrupt'}
+- Format: ${form.format||'Reel'}
+- Visual Style: ${form.visualStyle||''}
+- Notes: ${form.notes||''}
+
+Generate a complete 15-second Reel script with THREE different hooks (A, B, C — each testing a different emotion), plus Problem, Insight, Solution, and CTA scenes. Also include an AI visual prompt for every scene, and a Primary Text for the Meta feed (max 125 chars, no hashtags).
+
+Respond ONLY with valid JSON, no markdown:
+{
+  "hookA":{"vo":"...","prompt":"..."},
+  "hookB":{"vo":"...","prompt":"..."},
+  "hookC":{"vo":"...","prompt":"..."},
+  "problem":{"vo":"...","prompt":"..."},
+  "insight":{"vo":"...","prompt":"..."},
+  "solution":{"vo":"...","prompt":"..."},
+  "cta":{"vo":"...","prompt":"..."},
+  "primaryText":"..."
+}`;
+      const res=await fetch('https://api.anthropic.com/v1/messages',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,messages:[{role:'user',content:prompt}]})
+      });
+      const data=await res.json();
+      const text=data.content?.find(b=>b.type==='text')?.text||'';
+      const clean=text.replace(/```json|```/g,'').trim();
+      const g=JSON.parse(clean);
+      form.scenes=form.scenes.map(s=>{
+        if(s.id==='ha')return{...s,vo:g.hookA.vo,prompt:g.hookA.prompt};
+        if(s.id==='hb')return{...s,vo:g.hookB.vo,prompt:g.hookB.prompt};
+        if(s.id==='hc')return{...s,vo:g.hookC.vo,prompt:g.hookC.prompt};
+        if(s.id==='pr')return{...s,vo:g.problem.vo,prompt:g.problem.prompt};
+        if(s.id==='ins')return{...s,vo:g.insight.vo,prompt:g.insight.prompt};
+        if(s.id==='sol')return{...s,vo:g.solution.vo,prompt:g.solution.prompt};
+        if(s.id==='ct')return{...s,vo:g.cta.vo,prompt:g.cta.prompt};
+        return s;
+      });
+      form.metaCopy={...form.metaCopy,primaryText:g.primaryText||''};
+      form.status='Editing';
+    }catch(e){
+      toast('Copy generation failed — saving without copy');
+    }
+  }
+
   saving=true;render();
   const ok=await saveAd({...form,id:editId||form.id});
   saving=false;
-  if(ok){showForm=false;toast('Saved!');}
+  if(ok){showForm=false;toast(isNew&&!hasContent?'Brief saved with generated copy!':'Saved!');}
   render();
 };
 
