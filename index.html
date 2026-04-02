@@ -71,4 +71,32 @@ button,input,select,textarea{font-family:inherit}
 .lt{font-size:13px;font-weight:500;color:#9ca3af}.ls{font-size:12px;color:#9ca3af;margin-top:3px}
 .scf{border:1px solid #e5e7eb;border-radius:10px;padding:12px;background:#f9fafb;margin-bottom:10px}
 .wc{font-size:10px;color:#9ca3af;background:white;border:1px solid #e5e7eb;border-radius:99px;padding:1px 7px}
-.csp{background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:8px 12px;margin-botto
+.csp{background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:8px 12px;margin-bottom:12px}
+.cspt{font-size:12px;font-weight:600;color:#1e40af;margin-bottom:1px}
+.cspn{font-size:12px;color:#3b82f6}
+.cc{font-size:11px}.co{color:#ef4444;font-weight:700}.ck{color:#9ca3af}
+.br{border-color:#fca5a5!important}
+.toast{position:fixed;bottom:20px;right:20px;background:#111827;color:white;padding:10px 16px;border-radius:8px;font-size:13px;z-index:100;opacity:0;transition:opacity .2s}
+.toast.show{opacity:1}
+.load{display:flex;align-items:center;justify-content:center;height:60vh;color:#9ca3af;font-size:14px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="toast" id="toast"></div>
+<script>
+const SB_URL='https://fngxmhqkowrkzpgcofbn.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZuZ3htaHFrb3dya3pwZ2NvZmJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODQ3ODgsImV4cCI6MjA5MDU2MDc4OH0.rjLoi5Pz4d5UP_XF3AnxJ2ViY-jxpetwz_U7tWPWsoo';
+const sb=supabase.createClient(SB_URL,SB_KEY);
+const TABLE='ads';
+
+const TONES=[{v:'Humor',d:'Uses comedy or absurdity to earn attention and lower defenses'},{v:'Empathetic',d:"Mirrors the operator's stress or frustration before offering relief"},{v:'Provocative',d:'Designed to create mild tension or challenge an assumption'},{v:'Direct / Authoritative',d:'Straightforward and credibility-first. States the fact or leads with proof.'},{v:'Other',d:''}];
+const PRODS=[{v:'AI-Generated',d:'Visuals created entirely with AI image or video generation tools'},{v:'Live Shoot',d:'Real footage shot on location with a crew or handheld camera'},{v:'Motion Design',d:'Animated graphics, type, or illustrated elements built in post'},{v:'Stock',d:'Licensed footage or imagery from a stock library'}];
+const VISUALS=[{v:'Cinematic',d:'Polished, high-production. Looks like a TV spot or short film.'},{v:'Handheld / Documentary',d:'Raw, real-feeling. Shot on location in the moment.'},{v:'Talking Head',d:'Someone speaking directly to camera.'},{v:'Typography-Led',d:'Words and numbers are the visual. Text animates on screen.'},{v:'Graphic / Illustrated',d:'Charts, callouts, drawn visuals. Designed rather than filmed.'},{v:'Split Screen / Comparison',d:'Side-by-side structure. Two things being contrasted visually.'},{v:'Screen / UI',d:'The product interface is the visual.'},{v:'Mixed',d:'Combines two styles — e.g. handheld footage with text overlays.'},{v:'Other',d:''}];
+const STAGES=['Awareness','Consideration','Intent','Retargeting','Usage/Expansion'];
+const JOBS=['Interrupt','Reframe','Prove','Convert','Reinforce','Validate'];
+const FMTS=['Reel','Carousel','Static','Video (Feed)'];
+const ALL_ST=['Drafts','Editing','Review / Allocation','In Design','Live','Winner','Archive'];
+const GROUPS=['Brief 1 — Self-Aware AI','Brief 2 — Lifestyle / Chaos','Brief 3 — Math Motion','Brief 4 — Inertia / Habits','Brief 5 — Health / Peace of Mind','Brief 6 — Absurd Fees','Brief 7 — Customer Support','Pillar 1 — Money / Business','Pillar 2 — Life / Identity','Pillar 3 — Debate','Pillar 4 — Trucks and Tech','Pillar 5 — Health & Wellbeing','Pillar 6 — Roadcraft','Pillar 7 — Status / Respect','Claims Ads','Doc 1'];
+const STAGE_D={Awareness:"They have a pain but haven't done anything about it. Job: interrupt and make the problem feel real.",Consideration:"They're thinking 'maybe there's a better way.' Job: shift their thinking.",Intent:'Actively comparing options. Job: prove Mudflap is best and remove doubt.',Retargeting:"Seen the ads but haven't signed up. Job: nudge over the finish line.",'Usage/Expansion':'Already using Mudflap. Job: validate their decision and build identity.'};
+const JOB_D={Interrupt:'Stop the scroll before they know why. The hook must create a pattern break.',Reframe:"Change how they see the problem. They already know it exists — they just framed it wrong.",Prove:"Remove doubt with evidence. They're almost convinced but need proof.",Convert:"Push them over the finish line. They're ready — remove the last objection.",Rei
