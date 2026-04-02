@@ -211,7 +211,7 @@ function buildForm(){
 </div>
 <div><div class="fst">Funnel</div><div class="fr">
 <div><label class="fl">Funnel Stage</label><select class="fs" id="ffs" onchange="fCh('funnelStage',this.value)"><option value="">—</option><option value="__system__" ${form.funnelStage==='__system__'?'selected':''}>System Picks</option>${STAGES.map(s=>`<option ${form.funnelStage===s?'selected':''}>${s}</option>`).join('')}</select>${form.funnelStage&&form.funnelStage!=='__system__'?`<div class="fh">${STAGE_D[form.funnelStage]||''}</div>`:''}</div>
-<div><label class="fl">Job To Be Done</label><select class="fs" id="fjob"><option value="">—</option><option value="__system__" ${form.job==='__system__'?'selected':''}>System Picks</option>${JOBS.map(j=>`<option ${form.job===j?'selected':''}>${j}</option>`).join('')}</select>${form.job&&form.job!=='__system__'?`<div class="fh">${JOB_D[form.job]||''}</div>`:''}</div>
+<div><label class="fl">Job To Be Done</label><select class="fs" id="fjob" onchange="fCh('job',this.value)"><option value="">—</option><option value="__system__" ${form.job==='__system__'?'selected':''}>System Picks</option>${JOBS.map(j=>`<option ${form.job===j?'selected':''}>${j}</option>`).join('')}</select>${form.job&&form.job!=='__system__'?`<div class="fh">${JOB_D[form.job]||''}</div>`:''}</div>
 </div></div>
 <div><div class="fst">Format & Style</div>
 <div class="fg"><label class="fl">Format *</label><select class="fs" id="ffmt" onchange="fCh('format',this.value)">${FMTS.map(f=>`<option ${form.format===f?'selected':''}>${f}</option>`).join('')}</select>${form.format?`<div class="fh">${FMT_D[form.format]}</div>`:''}</div>
@@ -248,9 +248,7 @@ window.updSc=(i,f,v)=>{form.scenes[i][f]=v;};
 window.updM=(k,v)=>{form.metaCopy[k]=v;};
 window.cpTxt=(btn,txt)=>{navigator.clipboard.writeText(txt.replace(/\\n/g,'\n'));btn.textContent='✓';btn.classList.add('ok');setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('ok');},1400);};
 window.subForm=async()=>{
-  const concept=document.getElementById('fc')?.value.trim();
-  if(!concept){toast('Title is required');return;}
-  form.concept=concept;
+  form.concept=(document.getElementById('fc')?.value||'').trim();
   form.coreInsight=document.getElementById('fi')?.value||'';
   const hypA=document.getElementById('fhyp-a')?.value||'';
   const hypB=document.getElementById('fhyp-b')?.value||'';
@@ -265,6 +263,8 @@ window.subForm=async()=>{
   form.visualStyle=document.getElementById('fvs')?.value||'';
   form.notes=document.getElementById('fnot')?.value||'';
   document.querySelectorAll('.scf').forEach((el,i)=>{const tas=el.querySelectorAll('textarea');if(tas[0])form.scenes[i].vo=tas[0].value;if(tas[1])form.scenes[i].prompt=tas[1].value;});
+
+  if(!form.concept){toast('Title is required');return;}
 
   const isNew=!editId;
   const hasContent=form.scenes.some(s=>s.vo||s.prompt);
