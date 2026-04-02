@@ -294,7 +294,7 @@ Generate a complete 15-second Reel script with THREE different hooks (A, B, C â€
 
 Respond ONLY with valid JSON, no markdown:
 {"hookA":{"vo":"...","prompt":"..."},"hookB":{"vo":"...","prompt":"..."},"hookC":{"vo":"...","prompt":"..."},"problem":{"vo":"...","prompt":"..."},"insight":{"vo":"...","prompt":"..."},"solution":{"vo":"...","prompt":"..."},"cta":{"vo":"...","prompt":"..."},"primaryText":"..."}`;
-      const res=await fetch('https://api.anthropic.com/v1/messages',{
+     const res=await fetch('/api/generate',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
         body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,messages:[{role:'user',content:genPrompt}]})
