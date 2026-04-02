@@ -277,7 +277,6 @@ window.subForm=async()=>{
   if(isNew&&!hasContent){
     saving=true;
     toast('Generating copy…');
-    render();
     try{
       const genPrompt=`You are a creative director writing Meta ad scripts for Mudflap, a fuel savings app for heavy truck fleet operators (5+ trucks). Write short, punchy, direct copy that speaks to operators who are skeptical, busy, and value real savings over marketing speak.
 
@@ -315,7 +314,7 @@ Respond ONLY with valid JSON, no markdown:
         return s;
       });
       form.metaCopy={...form.metaCopy,primaryText:g.primaryText||''};
-      form.status='Drafts';
+      form.status='Editing';
     }catch(e){
       console.error('Generation error:',e);
       toast('Copy generation failed: '+e.message);
