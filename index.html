@@ -123,7 +123,7 @@ let ads=[],viewTab='Briefs',search='',fStage='All',fGroup='All',fTone='All',fFor
 let expIds=new Set(),showForm=false,editId=null,saving=false;
 
 function blankScenes(){return SCENE_DEFS.map(s=>({...s,vo:'',prompt:''}));}
-function blankForm(){return{concept:'',funnelStage:'',job:'',format:'Reel',tone:'',productionMethod:'',visualStyle:'',status:'Drafts',coreInsight:'',hypothesis:'',notes:'',metaCopy:{primaryText:'',headline:'',description:'',displayUrl:''},scenes:blankScenes(),metrics:{thumbStop:'',viewRate:'',completionRate:'',ctr:'',cpa:'',notes:''}};}
+function blankForm(){return{concept:'',funnelStage:'',job:'',format:'Reel',tone:'',productionMethod:'',visualStyle:'',status:'Drafts',coreInsight:'',hypothesis:'',ctaGoal:'',notes:'',metaCopy:{primaryText:'',headline:'',description:'',displayUrl:''},scenes:blankScenes(),metrics:{thumbStop:'',viewRate:'',completionRate:'',ctr:'',cpa:'',notes:''}};}
 let form=blankForm();
 
 const TONE_STYLES={'Humor':'background:#fef9c3;color:#713f12','Empathetic':'background:#dbeafe;color:#1e40af','Provocative':'background:#fce7f3;color:#831843','Direct / Authoritative':'background:#dcfce7;color:#14532d','TBD':'background:#f3f4f6;color:#6b7280'};
@@ -205,16 +205,17 @@ function buildForm(){
 <div class="mh"><div><div class="mt">${editId?'Edit Brief':'New Creative Brief'}</div><div class="ms">Mudflap · Meta · Heavy 5+ Fleets</div></div><button class="mc" onclick="cForm()">✕</button></div>
 <div class="mb">
 <div><div class="fst">Overview</div>
-<div class="fg"><label class="fl">Concept Name *</label><input class="fi" id="fc" value="${esc(form.concept)}" placeholder="e.g. The Confession"></div>
+<div class="fg"><label class="fl">Title *</label><input class="fi" id="fc" value="${esc(form.concept)}" placeholder="e.g. The Confession"></div>
 <div class="fg"><label class="fl">Core Insight *</label><textarea class="fa" id="fi" rows="2" placeholder="The one truth this ad is built on…">${esc(form.coreInsight)}</textarea></div>
-<div class="fg"><label class="fl">Hypothesis</label><textarea class="fa" id="fh" rows="2" placeholder="Why will this concept move a Heavy 5+ fleet operator?">${esc(form.hypothesis)}</textarea></div>
+<div class="fg"><label class="fl">Hypothesis</label><div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:8px 10px;font-size:13px"><span style="color:#6b7280;white-space:nowrap">If our audience is</span><input class="fi" id="fhyp-a" style="flex:1;min-width:120px;padding:4px 8px;font-size:13px" placeholder="audience state" value="${esc((form.hypothesis||'').split('||')[0]||'')}"><span style="color:#6b7280;white-space:nowrap">, then we need the hook/concept to</span><input class="fi" id="fhyp-b" style="flex:1;min-width:120px;padding:4px 8px;font-size:13px" placeholder="specific behavior change" value="${esc((form.hypothesis||'').split('||')[1]||'')}"></div></div>
+<div class="fg"><label class="fl" style="display:flex;align-items:center;gap:6px">CTA <span title="What do we want them to do?" style="background:#e5e7eb;color:#6b7280;border-radius:99px;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;cursor:help;font-weight:700">?</span></label><input class="fi" id="fcta" value="${esc(form.ctaGoal||'')}" placeholder="What do we want them to do?"></div>
 </div>
 <div><div class="fst">Funnel</div><div class="fr">
-<div><label class="fl">Funnel Stage</label><select class="fs" id="ffs" onchange="fCh('funnelStage',this.value)"><option value="">Select…</option>${STAGES.map(s=>`<option ${form.funnelStage===s?'selected':''}>${s}</option>`).join('')}</select>${form.funnelStage&&form.funnelStage!=='TBD'?`<div class="fh">${STAGE_D[form.funnelStage]}</div>`:''}</div>
-<div><label class="fl">Job To Be Done</label><select class="fs" id="fjob"><option value="">Select…</option>${JOBS.map(j=>`<option ${form.job===j?'selected':''}>${j}</option>`).join('')}</select></div></div></div>
+<div><label class="fl">Funnel Stage</label><select class="fs" id="ffs" onchange="fCh('funnelStage',this.value)"><option value="">You Pick</option>${STAGES.map(s=>`<option ${form.funnelStage===s?'selected':''}>${s}</option>`).join('')}</select>${form.funnelStage&&form.funnelStage!=='TBD'?`<div class="fh">${STAGE_D[form.funnelStage]}</div>`:''}</div>
+<div><label class="fl">Job To Be Done</label><select class="fs" id="fjob"><option value="">You Pick</option>${JOBS.map(j=>`<option ${form.job===j?'selected':''}>${j}</option>`).join('')}</select></div></div></div>
 <div><div class="fst">Format & Style</div>
 <div class="fg"><label class="fl">Format *</label><select class="fs" id="ffmt" onchange="fCh('format',this.value)">${FMTS.map(f=>`<option ${form.format===f?'selected':''}>${f}</option>`).join('')}</select>${form.format?`<div class="fh">${FMT_D[form.format]}</div>`:''}</div>
-<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">${[[TONES,'Tone','tone','ftn'],[PRODS,'Production Method','productionMethod','fpm'],[VISUALS,'Visual Style','visualStyle','fvs']].map(([opts,label,key,id])=>`<div><label class="fl">${label}</label><select class="fs" id="${id}" onchange="fCh('${key}',this.value)"><option value="">Select…</option>${opts.map(t=>`<option value="${t.v}" ${form[key]===t.v?'selected':''}>${t.v}</option>`).join('')}</select>${form[key]&&form[key]!=='TBD'?`<div class="fh" style="font-size:11px">${opts.find(t=>t.v===form[key])?.d||''}</div>`:''}</div>`).join('')}</div></div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">${[[TONES,'Tone','tone','ftn'],[PRODS,'Production Method','productionMethod','fpm'],[VISUALS,'Visual Style','visualStyle','fvs']].map(([opts,label,key,id])=>`<div><label class="fl">${label}</label><select class="fs" id="${id}" onchange="fCh('${key}',this.value)"><option value="">You Pick</option>${opts.map(t=>`<option value="${t.v}" ${form[key]===t.v?'selected':''}>${t.v}</option>`).join('')}</select>${form[key]&&form[key]!=='TBD'?`<div class="fh" style="font-size:11px">${opts.find(t=>t.v===form[key])?.d||''}</div>`:''}</div>`).join('')}</div></div>
 <div><div class="fst">Notes</div><textarea class="fa" id="fnot" rows="2" placeholder="Brief / Pillar group, talent, locations, deadlines…">${esc(form.notes)}</textarea></div>
 ${!ip?`<div class="lk"><div class="lt">🔒 Script Direction & Ad Copy</div><div class="ls">Unlocks when status moves to <strong>Editing</strong> or beyond.</div></div>`:`
 <div><div class="fst">Script Direction</div>${form.scenes.map((sc,i)=>`<div class="scf"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:13px;font-weight:700;color:#111827">${sc.label}</span><span style="font-size:11px;color:#9ca3af;background:white;border:1px solid #e5e7eb;border-radius:99px;padding:1px 7px">${sc.timing}</span><span class="wc">${sc.wc}</span></div>
@@ -246,7 +247,10 @@ window.subForm=async()=>{
   if(!concept){toast('Concept name is required');return;}
   form.concept=concept;
   form.coreInsight=document.getElementById('fi')?.value||'';
-  form.hypothesis=document.getElementById('fh')?.value||'';
+  const hypA=document.getElementById('fhyp-a')?.value||'';
+  const hypB=document.getElementById('fhyp-b')?.value||'';
+  form.hypothesis=hypA&&hypB?`${hypA}||${hypB}`:(hypA||hypB);
+  form.ctaGoal=document.getElementById('fcta')?.value||'';
   form.status=form.status||'Briefs';
   form.funnelStage=document.getElementById('ffs')?.value||'';
   form.job=document.getElementById('fjob')?.value||'';
@@ -320,6 +324,7 @@ Respond ONLY with valid JSON, no markdown:
   const ok=await saveAd({...form,id:editId||form.id});
   saving=false;
   if(ok){showForm=false;toast(isNew&&!hasContent?'Brief saved with generated copy!':'Saved!');}
+  else{saving=false;}
   render();
 };
 
