@@ -314,7 +314,7 @@ Respond ONLY with valid JSON, no markdown:
         return s;
       });
       form.metaCopy={...form.metaCopy,primaryText:g.primaryText||''};
-      form.status='Editing';
+form.status='Drafts';
     }catch(e){
       console.error('Generation error:',e);
       toast('Copy generation failed: '+e.message);
