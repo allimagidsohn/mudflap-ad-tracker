@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pipeline — Mudflap Creative</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f5f2;
+  --surface: #ffffff;
+  --surface2: #f0f0ed;
+  --border: #e2e2de;
+  --border2: #c8c8c4;
+  --text: #111111;
+  --muted: #888884;
+  --muted2: #bbbbb8;
+  --accent: #1db954;
+  --accent-dark: #169944;
+  --accent-dim: rgba(29,185,84,0.08);
+  --accent-border: rgba(29,185,84,0.3);
+  --red: #e03535;
+  --orange: #d97706;
+  --blue: #2563eb;
+  --teal: #0d9488;
+  --purple: #7c3aed;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg); color: var(--text);
+  min-height: 100vh; font-size: 14px;
+}
+
+/* NAV */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(14,14,14,0.92); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 28px; height: 52px;
+}
+.nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; margin-right: 20px; }
+.nav-logo-img { height: 26px; width: auto; display: block; }
+.nav-logo-text { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px; color: var(--accent); }
+.nav-divider { width: 1px; height: 20px; background: var(--border); margin-right: 6px; }
+.nav-links { display: flex; gap: 4px; }
+.nav-link { padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 500; color: var(--muted); text-decoration: none; transition: all 0.15s; }
+.nav-link:hover { color: var(--text); background: var(--surface2); }
+.nav-link.active { color: var(--text); background: var(--surface2); }
+.nav-right { display: flex; align-items: center; gap: 12px; }
+.ad-count { font-size: 12px; color: var(--muted); }
+
+/* STAGE TABS */
+.stage-bar {
+  position: fixed; top: 52px; left: 0; right: 0; z-index: 90;
+  background: rgba(245,245,242,0.95); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  display: flex; overflow-x: auto; padding: 0 20px;
+  scrollbar-width: none;
+}
+.stage-bar::-webkit-scrollbar { display: none; }
+.stage-tab {
+  padding: 14px 18px; white-space: nowrap;
+  font-size: 12px; font-weight: 500; color: var(--muted);
+  cursor: pointer; border-bottom: 2px solid transparent;
+  transition: all 0.15s; display: flex; align-items: center; gap: 7px;
+  flex-shrink: 0;
+}
+.stage-tab:hover { color: var(--text); }
+.stage-tab.active { color: var(--text); border-bottom-color: var(--accent); }
+.stage-count {
+  font-size: 10px; padding: 1px 7px; border-radius: 99px;
+  font-weight: 600;
+}
+
+/* FILTERS */
+.filter-bar {
+  padding: 14px 28px; display: flex; gap: 10px; flex-wrap: wrap;
+  align-items: center; margin-top: 104px;
+}
+.filter-input {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 8px; padding: 8px 12px;
+  font-family: 'DM Sans', sans-serif; font-size: 13px;
+  color: var(--text); outline: none; width: 200px;
+  transition: border-color 0.15s;
+}
+.filter-input:focus { border-color: var(--border2); }
+.filter-input::placeholder { color: var(--muted2); }
+.filter-select {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 8px; padding: 8px 12px;
+  font-family: 'DM Sans', sans-serif; font-size: 13px;
+  color: var(--text); outline: none; cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b6b6b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center;
+  padding-right: 28px;
+}
+.filter-select option { background: #1f1f1f; }
+.clear-btn {
+  font-size: 12px; padding: 7px 12px; border-radius: 6px;
+  border: 1.5px solid var(--border); background: transparent;
+  color: var(--muted); cursor: pointer; transition: all 0.12s;
+}
+.clear-btn:hover { color: var(--text); }
+
+/* MAIN CONTENT */
+.main { padding: 0 28px 80px; }
+
+/* EMPTY */
+.empty-state {
+  text-align: center; padding: 80px 20px;
+  color: var(--muted); font-size: 14px;
+}
+.empty-state a { color: var(--accent); text-decoration: none; }
+.empty-state a:hover { text-decoration: underline; }
+
+/* AD CARDS */
+.ads-list { display: flex; flex-direction: column; gap: 10px; padding-top: 4px; }
+.ad-card {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 12px; overflow: hidden;
+  transition: border-color 0.15s;
+}
+.ad-card:hover { border-color: var(--border2); }
+.ad-card.winner { border-color: rgba(167,139,250,0.4); }
+
+.card-main {
+  display: flex; align-items: flex-start;
+  padding: 14px 18px; gap: 14px; cursor: pointer;
+}
+.card-body { flex: 1; min-width: 0; }
+.card-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; align-items: center; }
+.card-title { font-size: 14px; font-weight: 600; color: var(--text); }
+.card-insight { font-size: 12px; color: var(--muted); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+
+.status-select {
+  font-size: 11px; border: 1px solid var(--border2);
+  border-radius: 6px; padding: 5px 8px;
+  background: var(--surface2); color: var(--text);
+  cursor: pointer; font-family: 'DM Sans', sans-serif;
+  outline: none; appearance: none;
+  padding-right: 20px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M1 1l3 3 3-3' stroke='%236b6b6b' stroke-width='1.2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 7px center;
+}
+.status-select option { background: #1f1f1f; }
+
+.icon-btn {
+  width: 28px; height: 28px; border-radius: 6px;
+  border: 1.5px solid var(--border); background: transparent;
+  color: var(--muted); cursor: pointer; font-size: 13px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.12s;
+}
+.icon-btn:hover { color: var(--text); border-color: var(--border2); }
+.icon-btn.danger:hover { color: var(--red); border-color: rgba(255,77,77,0.4); }
+
+/* EXPAND */
+.card-expanded {
+  border-top: 1px solid var(--border);
+  padding: 16px 18px;
+  background: rgba(0,0,0,0.2);
+}
+.exp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+.exp-field { }
+.exp-label { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 3px; }
+.exp-val { font-size: 12px; color: var(--text); line-height: 1.5; }
+
+.scenes-section { margin-top: 14px; }
+.section-head {
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 10px; padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+.scene-block { margin-bottom: 12px; }
+.scene-lbl {
+  font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+  font-weight: 600; margin-bottom: 4px; display: flex;
+  align-items: center; justify-content: space-between;
+}
+.scene-lbl.hook { color: var(--blue); }
+.scene-lbl.problem { color: var(--orange); }
+.scene-lbl.insight { color: var(--teal); }
+.scene-lbl.solution { color: var(--purple); }
+.scene-lbl.cta { color: var(--red); }
+.scene-vo-text { font-size: 13px; color: var(--text); line-height: 1.5; margin-bottom: 2px; }
+.scene-pr-text { font-size: 11px; color: var(--muted); line-height: 1.4; font-style: italic; }
+
+.meta-section { margin-top: 14px; }
+.meta-row {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 12px; padding: 8px 10px;
+  background: var(--surface); border-radius: 7px; margin-bottom: 6px;
+}
+.meta-text { flex: 1; font-size: 12px; color: var(--text); line-height: 1.5; }
+.copy-btn {
+  font-size: 11px; padding: 3px 9px; border-radius: 5px;
+  border: 1.5px solid var(--border); background: transparent;
+  color: var(--muted); cursor: pointer; flex-shrink: 0;
+  transition: all 0.12s; font-family: 'DM Sans', sans-serif;
+}
+.copy-btn:hover { color: var(--text); }
+.copy-btn.ok { border-color: var(--teal); color: var(--teal); }
+
+/* PILLS */
+.pill {
+  font-size: 11px; padding: 2px 9px; border-radius: 99px;
+  font-weight: 500; white-space: nowrap;
+}
+
+/* STATUS PILLS */
+.s-waiting { background: rgba(77,159,255,0.15); color: var(--blue); border: 1px solid rgba(77,159,255,0.3); }
+.s-approved { background: rgba(62,207,178,0.12); color: var(--teal); border: 1px solid rgba(62,207,178,0.3); }
+.s-production { background: rgba(255,140,66,0.12); color: var(--orange); border: 1px solid rgba(255,140,66,0.3); }
+.s-live { background: rgba(232,255,71,0.1); color: var(--accent); border: 1px solid rgba(232,255,71,0.25); }
+.s-winner { background: rgba(167,139,250,0.12); color: var(--purple); border: 1px solid rgba(167,139,250,0.3); }
+.s-revision { background: rgba(255,77,77,0.1); color: var(--red); border: 1px solid rgba(255,77,77,0.3); }
+.s-archive { background: rgba(107,107,107,0.15); color: var(--muted); border: 1px solid var(--border2); }
+.s-retired { background: rgba(107,107,107,0.08); color: var(--muted2); border: 1px solid var(--border); }
+
+.stage-pill { background: rgba(255,255,255,0.05); color: var(--muted); border: 1px solid var(--border2); }
+.format-pill { background: rgba(255,255,255,0.04); color: var(--muted2); border: 1.5px solid var(--border); }
+
+/* LOAD */
+.load { display: flex; align-items: center; justify-content: center; height: 40vh; color: var(--muted); }
+.toast { position: fixed; bottom: 24px; right: 24px; background: var(--surface); border: 1px solid var(--border2); color: var(--text); padding: 12px 18px; border-radius: 8px; font-size: 13px; z-index: 200; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
+.toast.show { opacity: 1; }
+.toast.success { border-color: var(--teal); color: var(--teal); }
+
+.stats-row {
+  display: grid; grid-template-columns: repeat(7,1fr); gap: 6px;
+  padding: 14px 28px 0;
+}
+.stat-tile {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 8px; padding: 10px 12px; text-align: center;
+  cursor: pointer; transition: all 0.15s;
+}
+.stat-tile:hover { border-color: var(--border2); }
+.stat-tile.active { border-color: var(--accent); background: var(--accent-dim); box-shadow: 0 0 0 3px rgba(29,185,84,0.1); }
+.stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 24px; line-height: 1; }
+.stat-lbl { font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-top: 3px; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-logo" href="create.html">
+    <img class="nav-logo-img"
+      src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Mudflap_logo.svg/2560px-Mudflap_logo.svg.png"
+      alt="Mudflap"
+      onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+    <span class="nav-logo-text" style="display:none">MUDFLAP</span>
+  </a>
+  <div class="nav-divider"></div>
+  <div class="nav-links">
+    <a class="nav-link" href="create.html">Create</a>
+    <a class="nav-link active" href="index.html">Pipeline</a>
+  </div>
+  <div class="nav-right">
+    <span class="ad-count" id="totalCount"></span>
+  </div>
+</nav>
+
+<div class="stage-bar" id="stageBar"></div>
+
+<div id="statsRow" class="stats-row"></div>
+<div class="filter-bar" id="filterBar"></div>
+<div class="main" id="main"><div class="load">Loading pipeline…</div></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SB_URL='https://fngxmhqkowrkzpgcofbn.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZuZ3htaHFrb3dya3pwZ2NvZmJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODQ3ODgsImV4cCI6MjA5MDU2MDc4OH0.rjLoi5Pz4d5UP_XF3AnxJ2ViY-jxpetwz_U7tWPWsoo';
+const sb=supabase.createClient(SB_URL,SB_KEY);
+
+const STAGES=[
+  {key:'Waiting for Review', cls:'s-waiting'},
+  {key:'Approved for Design', cls:'s-approved'},
+  {key:'In Production', cls:'s-production'},
+  {key:'Live', cls:'s-live'},
+  {key:'Winner', cls:'s-winner'},
+  {key:'Needs Revision', cls:'s-revision'},
+  {key:'Archived', cls:'s-archive'},
+  {key:'Retired', cls:'s-retired'}
+];
+// Map old statuses to new
+const STATUS_MAP={
+  'Drafts':'Waiting for Review',
+  'Editing':'Waiting for Review',
+  'Review / Allocation':'Waiting for Review',
+  'In Design':'Approved for Design',
+  'Live':'Live',
+  'Winner':'Winner',
+  'Archive':'Archived',
+  'Retired':'Retired'
+};
+const SCENE_ID_CLASS={ha:'hook',hb:'hook',hc:'hook',pr:'problem',ins:'insight',sol:'solution',ct:'cta'};
+
+let ads=[];
+let activeStage='Waiting for Review';
+let search='';
+let fStage='All';
+let expanded=new Set();
+
+function normalizeStatus(s){return STATUS_MAP[s]||s;}
+
+function toast(msg,type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast show'+(type?' '+type:'');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+async function load(){
+  const{data,error}=await sb.from('ads').select('*').order('created_at',{ascending:false});
+  if(error){document.getElementById('main').innerHTML=`<div class="load">Error: ${error.message}</div>`;return;}
+  ads=(data||[]).map(r=>({
+    ...r,
+    status:normalizeStatus(r.status||'Waiting for Review'),
+    funnelStage:r.funnel_stage||'',
+    coreInsight:r.core_insight||'',
+    productionMethod:r.production_method||'',
+    visualStyle:r.visual_style||'',
+    scenes:r.scenes||[],
+    metaCopy:r.meta_copy||{},
+    metrics:r.metrics||{}
+  }));
+  render();
+}
+
+function filtered(){
+  const q=search.toLowerCase();
+  return ads.filter(a=>{
+    const inStage=a.status===activeStage;
+    const ms=!q||(a.concept||'').toLowerCase().includes(q)||(a.coreInsight||'').toLowerCase().includes(q);
+    const fs=fStage==='All'||a.funnelStage===fStage;
+    return inStage&&ms&&fs;
+  });
+}
+
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function statusPillClass(s){
+  const map={'Waiting for Review':'s-waiting','Approved for Design':'s-approved','In Production':'s-production','Live':'s-live','Winner':'s-winner','Needs Revision':'s-revision','Archived':'s-archive','Retired':'s-retired'};
+  return map[s]||'stage-pill';
+}
+
+function render(){
+  const vis=filtered();
+  const total=ads.length;
+  document.getElementById('totalCount').textContent=total+' total ads';
+
+  // Stage tabs
+  document.getElementById('stageBar').innerHTML=STAGES.map(s=>{
+    const cnt=ads.filter(a=>a.status===s.key).length;
+    return`<div class="stage-tab ${activeStage===s.key?'active':''}" onclick="setStage('${s.key}')">
+      ${s.key}
+      <span class="stage-count ${s.cls}">${cnt}</span>
+    </div>`;
+  }).join('');
+
+  // Filter bar
+  document.getElementById('filterBar').innerHTML=`
+    <input class="filter-input" placeholder="Search…" value="${esc(search)}" oninput="search=this.value;render()">
+    <select class="filter-select" onchange="fStage=this.value;render()">
+      <option value="All" ${fStage==='All'?'selected':''}>All Funnel Stages</option>
+      ${['Awareness','Consideration','Intent','Retargeting','Usage / Expansion'].map(s=>`<option value="${s}" ${fStage===s?'selected':''}>${s}</option>`).join('')}
+    </select>
+    ${(search||fStage!=='All')?`<button class="clear-btn" onclick="search='';fStage='All';render()">Clear</button>`:''}
+  `;
+
+  // Main
+  if(!vis.length){
+    const isEmpty=ads.filter(a=>a.status===activeStage).length===0;
+    document.getElementById('main').innerHTML=`<div class="empty-state">
+      ${isEmpty
+        ?`No ads in <strong>${activeStage}</strong> yet.<br><br><a href="create.html">Create your first brief →</a>`
+        :`No ads match your search.`}
+    </div>`;
+    return;
+  }
+
+  document.getElementById('main').innerHTML=`<div class="ads-list">${vis.map(a=>adCard(a)).join('')}</div>`;
+}
+
+function adCard(a){
+  const open=expanded.has(a.id);
+  const scenes=(a.scenes||[]).filter(s=>s.vo||s.prompt);
+  const mc=a.metaCopy||{};
+
+  const sceneClass=s=>{
+    const map={ha:'hook',hb:'hook',hc:'hook',pr:'problem',ins:'insight',sol:'solution',ct:'cta'};
+    return map[s.id]||'';
+  };
+
+  const sceneName=s=>{
+    const map={ha:'Hook A',hb:'Hook B',hc:'Hook C',pr:'Problem',ins:'Insight',sol:'Solution',ct:'CTA'};
+    return map[s.id]||s.label||s.id;
+  };
+
+  const expandedHtml=open?`<div class="card-expanded">
+    <div class="exp-grid">
+      ${a.funnelStage?`<div class="exp-field"><div class="exp-label">Funnel Stage</div><div class="exp-val">${esc(a.funnelStage)}</div></div>`:''}
+      ${a.job?`<div class="exp-field"><div class="exp-label">Job</div><div class="exp-val">${esc(a.job)}</div></div>`:''}
+      ${a.tone?`<div class="exp-field"><div class="exp-label">Tone</div><div class="exp-val">${esc(a.tone)}</div></div>`:''}
+      ${a.productionMethod?`<div class="exp-field"><div class="exp-label">Production</div><div class="exp-val">${esc(a.productionMethod)}</div></div>`:''}
+      ${a.visualStyle?`<div class="exp-field"><div class="exp-label">Visual Style</div><div class="exp-val">${esc(a.visualStyle)}</div></div>`:''}
+      ${a.coreInsight?`<div class="exp-field" style="grid-column:1/-1"><div class="exp-label">Core Insight</div><div class="exp-val">${esc(a.coreInsight)}</div></div>`:''}
+    </div>
+    ${scenes.length?`<div class="scenes-section">
+      <div class="section-head">Script Direction</div>
+      ${scenes.map(s=>`<div class="scene-block">
+        <div class="scene-lbl ${sceneClass(s)}">
+          <span>${sceneName(s)} · ${s.timing||''}</span>
+          ${s.vo?`<button class="copy-btn" onclick="cpTxt(this,'${s.vo.replace(/'/g,"&#39;")}')">Copy VO</button>`:''}
+        </div>
+        ${s.vo?`<div class="scene-vo-text">${esc(s.vo)}</div>`:''}
+        ${s.prompt?`<div class="scene-pr-text">${esc(s.prompt)}</div>`:''}
+      </div>`).join('')}
+    </div>`:''}
+    ${mc.primaryText?`<div class="meta-section">
+      <div class="section-head">Meta Copy</div>
+      ${[['Primary Text',mc.primaryText],['Headline',mc.headline],['Description',mc.description]].filter(([,v])=>v).map(([l,v])=>`
+        <div class="meta-row">
+          <div><div class="exp-label">${l}</div><div class="meta-text">${esc(v)}</div></div>
+          <button class="copy-btn" onclick="cpTxt(this,'${v.replace(/'/g,"&#39;")}')">Copy</button>
+        </div>`).join('')}
+    </div>`:''}
+  </div>`:'';
+
+  return`<div class="ad-card ${a.status==='Winner'?'winner':''}" id="card-${a.id}">
+    <div class="card-main" onclick="togExp('${a.id}')">
+      <div class="card-body">
+        <div class="card-pills">
+          <span class="pill ${statusPillClass(a.status)}">${a.status}</span>
+          ${a.funnelStage?`<span class="pill stage-pill">${a.funnelStage}</span>`:''}
+          ${a.format?`<span class="pill format-pill">${a.format}</span>`:''}
+          ${a.tone?`<span class="pill format-pill">${a.tone}</span>`:''}
+        </div>
+        <div class="card-title">${esc(a.concept||'Untitled')}</div>
+        ${a.coreInsight?`<div class="card-insight">${esc(a.coreInsight)}</div>`:''}
+      </div>
+      <div class="card-actions" onclick="event.stopPropagation()">
+        <select class="status-select" onchange="doStatus('${a.id}',this.value)">
+          ${STAGES.map(s=>`<option value="${s.key}" ${a.status===s.key?'selected':''}>${s.key}</option>`).join('')}
+        </select>
+        <button class="icon-btn danger" onclick="if(confirm('Delete this ad?'))doDelete('${a.id}')" title="Delete">✕</button>
+      </div>
+    </div>
+    ${expandedHtml}
+  </div>`;
+}
+
+function cpTxt(btn,txt){
+  navigator.clipboard.writeText(txt);
+  btn.textContent='Copied'; btn.classList.add('ok');
+  setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('ok');},1400);
+}
+
+window.setStage=s=>{activeStage=s;render();};
+window.togExp=id=>{expanded.has(id)?expanded.delete(id):expanded.add(id);render();};
+
+window.doStatus=async(id,status)=>{
+  ads=ads.map(a=>a.id===id?{...a,status}:a);
+  render();
+  const{error}=await sb.from('ads').update({status}).eq('id',id);
+  if(error)toast('Save failed: '+error.message);
+  else toast('Moved to '+status,'success');
+};
+
+window.doDelete=async id=>{
+  ads=ads.filter(a=>a.id!==id);
+  render();
+  await sb.from('ads').delete().eq('id',id);
+  toast('Deleted');
+};
+
+load();
+</script>
+</body>
+</html>
