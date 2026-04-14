@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Brief — Mudflap Creative</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f5f2;
+  --surface: #ffffff;
+  --surface2: #f0f0ed;
+  --border: #e2e2de;
+  --border2: #c8c8c4;
+  --text: #111111;
+  --muted: #888884;
+  --muted2: #bbbbb8;
+  --accent: #1db954;
+  --accent-dark: #169944;
+  --accent-dim: rgba(29,185,84,0.08);
+  --accent-border: rgba(29,185,84,0.3);
+  --red: #e03535;
+  --scene-hook: #2563eb;
+  --scene-problem: #d97706;
+  --scene-insight: #0d9488;
+  --scene-solution: #7c3aed;
+  --scene-cta: #e03535;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 14px; }
+
+/* NAV */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(245,245,242,0.95); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 28px; height: 56px; gap: 0;
+}
+.nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; margin-right: 20px; }
+.nav-logo-img { height: 26px; width: auto; display: block; }
+.nav-logo-text { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px; color: var(--accent); }
+.nav-divider { width: 1px; height: 20px; background: var(--border); margin-right: 6px; }
+.nav-links { display: flex; gap: 2px; }
+.nav-link { padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 500; color: var(--muted); text-decoration: none; transition: all 0.15s; }
+.nav-link:hover { color: var(--text); background: var(--surface2); }
+.nav-link.active { color: var(--text); background: var(--surface2); }
+
+/* PAGE */
+.page { padding: 84px 28px 100px; max-width: 1060px; margin: 0 auto; }
+.page-eyebrow { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+.page-title { font-family: 'Bebas Neue', sans-serif; font-size: 44px; letter-spacing: 1px; line-height: 1; color: var(--text); margin-bottom: 36px; }
+.section { margin-bottom: 36px; }
+.section-label { font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; display: flex; align-items: center; gap: 10px; font-weight: 600; }
+.section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.brief-divider { height: 1px; background: var(--border); margin: 28px 0; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 640px) { .two-col { grid-template-columns: 1fr; } }
+.helper { font-size: 12px; color: var(--muted); line-height: 1.6; margin-bottom: 10px; }
+
+/* TILES */
+.tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; }
+.tile { background: var(--surface); border: 1.5px solid var(--border); border-radius: 10px; padding: 14px 16px; cursor: pointer; transition: all 0.15s; user-select: none; }
+.tile:hover { border-color: var(--border2); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.tile.selected { border-color: var(--accent); background: var(--accent-dim); box-shadow: 0 0 0 3px rgba(29,185,84,0.1); }
+.tile-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 5px; }
+.tile-desc { font-size: 11px; color: var(--muted); line-height: 1.5; }
+.tile.selected .tile-name { color: var(--accent-dark); }
+
+/* PILLS */
+.pills { display: flex; flex-wrap: wrap; gap: 7px; }
+.pill { padding: 7px 15px; border-radius: 100px; border: 1.5px solid var(--border); font-size: 12px; font-weight: 500; color: var(--text); cursor: pointer; transition: all 0.15s; user-select: none; background: var(--surface); }
+.pill:hover { border-color: var(--border2); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+.pill.selected { border-color: var(--accent); background: var(--accent); color: #fff; font-weight: 600; box-shadow: 0 2px 8px rgba(29,185,84,0.2); }
+.pill.system { border-style: dashed; color: var(--muted); background: var(--surface2); font-style: italic; }
+.pill.system:hover { border-color: var(--muted); }
+.pill.system.selected { border-style: solid; background: var(--text); border-color: var(--text); color: #fff; font-style: normal; }
+.pill.nocta.selected { background: var(--muted); border-color: var(--muted); color: #fff; }
+
+/* TOGGLES */
+.toggles { display: flex; flex-wrap: wrap; gap: 8px; }
+.toggle-item { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1.5px solid var(--border); border-radius: 8px; padding: 10px 14px; cursor: pointer; transition: all 0.15s; user-select: none; }
+.toggle-item:hover { border-color: var(--border2); }
+.toggle-item.on { border-color: var(--accent-border); background: var(--accent-dim); }
+.toggle-track { width: 32px; height: 18px; border-radius: 100px; background: var(--border2); position: relative; transition: background 0.2s; flex-shrink: 0; }
+.toggle-item.on .toggle-track { background: var(--accent); }
+.toggle-thumb { width: 12px; height: 12px; border-radius: 50%; background: white; position: absolute; top: 3px; left: 3px; transition: left 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+.toggle-item.on .toggle-thumb { left: 17px; }
+.toggle-label { font-size: 12px; font-weight: 500; color: var(--muted); }
+.toggle-item.on .toggle-label { color: var(--accent-dark); }
+
+/* INPUTS */
+.insight-input { width: 100%; background: var(--surface); border: 1.5px solid var(--border); border-radius: 12px; padding: 16px 20px; font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--text); line-height: 1.6; resize: none; min-height: 90px; transition: border-color 0.15s; outline: none; }
+.insight-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(29,185,84,0.1); }
+.insight-input::placeholder { color: var(--muted2); }
+.opt-input { background: var(--surface); border: 1.5px solid var(--border); border-radius: 8px; padding: 10px 14px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text); outline: none; transition: border-color 0.15s; }
+.opt-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(29,185,84,0.1); }
+.opt-input::placeholder { color: var(--muted2); }
+
+/* HYPOTHESIS */
+.hyp-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; background: var(--surface); border: 1.5px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+.hyp-text { font-size: 13px; color: var(--muted); white-space: nowrap; }
+.hyp-input { flex: 1; min-width: 130px; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 7px; padding: 8px 12px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text); outline: none; transition: border-color 0.15s; }
+.hyp-input:focus { border-color: var(--accent); }
+.hyp-input::placeholder { color: var(--muted2); }
+
+/* GENERATE BTN */
+.gen-btn { width: 100%; padding: 18px; background: var(--accent); color: #fff; border: none; border-radius: 10px; font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px; cursor: pointer; transition: all 0.15s; margin-top: 8px; box-shadow: 0 4px 16px rgba(29,185,84,0.25); }
+.gen-btn:hover { background: var(--accent-dark); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(29,185,84,0.3); }
+.gen-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+.val-note { font-size: 12px; color: var(--red); margin-top: 8px; display: none; }
+
+/* OUTPUT */
+.output-section { margin-top: 56px; }
+.output-title { font-family: 'Bebas Neue', sans-serif; font-size: 30px; letter-spacing: 1px; color: var(--text); margin-bottom: 4px; }
+.output-subtitle { font-size: 12px; color: var(--muted); margin-bottom: 20px; }
+.ads-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+@media (max-width: 820px) { .ads-grid { grid-template-columns: 1fr; } }
+
+.ad-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; animation: fadeUp 0.35s ease both; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+.ad-card:nth-child(2) { animation-delay: 0.07s; }
+.ad-card:nth-child(3) { animation-delay: 0.14s; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+.ad-card-top { padding: 14px 16px 12px; border-bottom: 1px solid var(--border); background: var(--surface2); }
+.ad-num { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 3px; }
+.ad-hook-type { font-size: 14px; font-weight: 600; color: var(--text); }
+.ad-hook-line { font-size: 12px; color: var(--muted); margin-top: 3px; line-height: 1.4; font-style: italic; }
+
+.ad-scenes { padding: 14px 16px; flex: 1; }
+.scene-row { margin-bottom: 12px; }
+.scene-label { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; margin-bottom: 3px; }
+.scene-label.hook { color: var(--scene-hook); }
+.scene-label.problem { color: var(--scene-problem); }
+.scene-label.insight { color: var(--scene-insight); }
+.scene-label.solution { color: var(--scene-solution); }
+.scene-label.cta { color: var(--scene-cta); }
+.scene-vo { font-size: 13px; color: var(--text); line-height: 1.5; font-weight: 500; }
+.scene-prompt { font-size: 11px; color: var(--muted); line-height: 1.4; margin-top: 2px; font-style: italic; }
+
+.ad-meta-section { padding: 10px 16px 12px; border-top: 1px solid var(--border); background: var(--surface2); }
+.meta-label-sm { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; font-weight: 700; }
+.meta-value { font-size: 12px; color: var(--text); line-height: 1.5; }
+
+.scene-vo-edit, .meta-edit { width: 100%; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 6px; padding: 7px 10px; font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--text); resize: none; outline: none; line-height: 1.5; }
+.scene-vo-edit:focus, .meta-edit:focus { border-color: var(--accent); }
+
+.ad-actions { padding: 10px 16px; border-top: 1px solid var(--border); display: flex; gap: 8px; }
+.btn-edit { flex: 1; padding: 8px; border-radius: 7px; border: 1.5px solid var(--border); background: transparent; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.12s; }
+.btn-edit:hover { color: var(--text); border-color: var(--border2); }
+.btn-edit.active { color: var(--text); background: var(--surface2); }
+.btn-approve { flex: 1; padding: 8px; border-radius: 7px; border: none; background: var(--accent); color: #fff; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.12s; }
+.btn-approve:hover { background: var(--accent-dark); }
+.btn-approve:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-retire { flex: 1; padding: 8px; border-radius: 7px; border: 1.5px solid var(--border2); background: transparent; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.12s; }
+.btn-retire:hover { border-color: var(--red); color: var(--red); }
+.btn-saved { flex: 1; padding: 8px; border-radius: 7px; border: 1.5px solid var(--accent-border); background: var(--accent-dim); color: var(--accent-dark); font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; cursor: default; }
+.btn-retired { flex: 1; padding: 8px; border-radius: 7px; border: 1.5px solid var(--border); background: var(--surface2); color: var(--muted2); font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; cursor: default; font-style: italic; }
+
+/* GENERATING */
+.generating { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; gap: 18px; }
+.gen-label { font-size: 13px; color: var(--muted); }
+.gen-bars { display: flex; gap: 5px; align-items: flex-end; height: 28px; }
+.gen-bar { width: 5px; background: var(--accent); border-radius: 3px; animation: barPulse 1s ease-in-out infinite; }
+.gen-bar:nth-child(2) { animation-delay: 0.12s; }
+.gen-bar:nth-child(3) { animation-delay: 0.24s; }
+.gen-bar:nth-child(4) { animation-delay: 0.36s; }
+.gen-bar:nth-child(5) { animation-delay: 0.48s; }
+@keyframes barPulse { 0%,100% { height:5px; opacity:0.25; } 50% { height:28px; opacity:1; } }
+
+.error-box { background: rgba(224,53,53,0.06); border: 1.5px solid rgba(224,53,53,0.2); border-radius: 8px; padding: 14px 18px; font-size: 13px; color: var(--red); line-height: 1.5; }
+.toast { position: fixed; bottom: 24px; right: 24px; background: var(--text); color: white; padding: 12px 18px; border-radius: 8px; font-size: 13px; z-index: 200; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
+.toast.show { opacity: 1; }
+.toast.success { background: var(--accent-dark); }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-logo" href="create.html">
+    <img class="nav-logo-img"
+      src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Mudflap_logo.svg/2560px-Mudflap_logo.svg.png"
+      alt="Mudflap"
+      onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+    <span class="nav-logo-text" style="display:none">MUDFLAP</span>
+  </a>
+  <div class="nav-divider"></div>
+  <div class="nav-links">
+    <a class="nav-link active" href="create.html">Create</a>
+    <a class="nav-link" href="index.html">Pipeline</a>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="page-title">NEW CREATIVE BRIEF</div>
+
+  <!-- CHANNEL -->
+  <div class="section">
+    <div class="section-label">Channel</div>
+    <div class="tiles" id="channelTiles">
+      <div class="tile" onclick="selectChannel(this,'meta')">
+        <div class="tile-name">Meta</div>
+        <div class="tile-desc">Facebook &amp; Instagram. 15s Reel. Primary text 125 chars.</div>
+      </div>
+      <div class="tile" onclick="selectChannel(this,'tiktok')">
+        <div class="tile-name">TikTok</div>
+        <div class="tile-desc">In-Feed video. 15–60s. Primary text 100 chars. Raw &amp; native.</div>
+      </div>
+      <div class="tile" onclick="selectChannel(this,'youtube_instream')">
+        <div class="tile-name">YouTube In-Stream</div>
+        <div class="tile-desc">Skippable after 5s. 15–30s sweet spot. Hook window is 0–5s.</div>
+      </div>
+      <div class="tile" onclick="selectChannel(this,'youtube_bumper')">
+        <div class="tile-name">YouTube Bumper</div>
+        <div class="tile-desc">6s non-skippable. One line, one visual. No scene structure.</div>
+      </div>
+      <div class="tile" onclick="selectChannel(this,'linkedin')">
+        <div class="tile-name">LinkedIn</div>
+        <div class="tile-desc">Video or image. Intro text 150 chars, Headline 70, Description 100.</div>
+      </div>
+    </div>
+    <div id="channel-spec-note" style="display:none;margin-top:10px;font-size:12px;color:var(--muted);background:var(--surface);border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;line-height:1.6"></div>
+  </div>
+
+    <!-- FUNNEL STAGE -->
+  <div class="section">
+    <div class="section-label">Funnel Stage</div>
+    <div class="tiles">
+      <div class="tile" onclick="selectTile('stage',this,'Awareness')">
+        <div class="tile-name">Awareness</div>
+        <div class="tile-desc">They feel the pain but haven't acted. Interrupt and make the problem real.</div>
+      </div>
+      <div class="tile" onclick="selectTile('stage',this,'Consideration')">
+        <div class="tile-name">Consideration</div>
+        <div class="tile-desc">Thinking "maybe there's a better way." Shift how they see the problem.</div>
+      </div>
+      <div class="tile" onclick="selectTile('stage',this,'Intent')">
+        <div class="tile-name">Intent</div>
+        <div class="tile-desc">Actively comparing options. Prove Mudflap is best, remove doubt.</div>
+      </div>
+      <div class="tile" onclick="selectTile('stage',this,'Retargeting')">
+        <div class="tile-name">Retargeting</div>
+        <div class="tile-desc">Seen ads, haven't signed up. Nudge them over the finish line.</div>
+      </div>
+      <div class="tile" onclick="selectTile('stage',this,'Usage / Expansion')">
+        <div class="tile-name">Usage / Expansion</div>
+        <div class="tile-desc">Already using Mudflap. Validate their decision, build identity.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JOB -->
+  <div class="section">
+    <div class="section-label">Job To Be Done</div>
+    <div class="tiles">
+      <div class="tile" onclick="selectTile('job',this,'Interrupt')">
+        <div class="tile-name">Interrupt</div>
+        <div class="tile-desc">Stop the scroll before they know why. Hook must land in under 2 seconds.</div>
+      </div>
+      <div class="tile" onclick="selectTile('job',this,'Reframe')">
+        <div class="tile-name">Reframe</div>
+        <div class="tile-desc">Change how they see the problem — they know it exists, they just framed it wrong.</div>
+      </div>
+      <div class="tile" onclick="selectTile('job',this,'Prove')">
+        <div class="tile-name">Prove</div>
+        <div class="tile-desc">Remove doubt with evidence. They're almost convinced — give them the proof.</div>
+      </div>
+      <div class="tile" onclick="selectTile('job',this,'Convert')">
+        <div class="tile-name">Convert</div>
+        <div class="tile-desc">Push over the finish line. They're ready — remove the last objection.</div>
+      </div>
+      <div class="tile" onclick="selectTile('job',this,'Reinforce')">
+        <div class="tile-name">Reinforce</div>
+        <div class="tile-desc">Validate a decision they already made. Build identity and loyalty.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="brief-divider"></div>
+
+  <!-- CTA -->
+  <div class="section">
+    <div class="section-label">CTA — What should they do next?</div>
+    <div class="pills" id="ctaPills">
+      <div class="pill" onclick="selectPill('cta',this,'Apply for the card')">Apply for the card</div>
+      <div class="pill" onclick="selectPill('cta',this,'Download the app')">Download the app</div>
+      <div class="pill" onclick="selectPill('cta',this,'Go to website')">Go to website</div>
+      <div class="pill" onclick="selectPill('cta',this,'Download the playbook')">Download the playbook</div>
+      <div class="pill" onclick="selectPill('cta',this,'Calculate your savings')">Calculate your savings</div>
+      <div class="pill" onclick="selectPill('cta',this,'Share with a friend')">Share with a friend</div>
+      <div class="pill" onclick="selectPill('cta',this,'Follow on social')">Follow on social</div>
+      <div class="pill nocta" onclick="selectPill('cta',this,'none')">No CTA</div>
+    </div>
+  </div>
+
+  <div class="brief-divider"></div>
+
+  <!-- TONE -->
+  <div class="section">
+    <div class="section-label">Tone</div>
+    <div class="pills" id="tonePills">
+      <div class="pill" onclick="selectPill('tone',this,'Deadpan')">Deadpan <span style="font-size:10px;opacity:0.5">dry, flat delivery</span></div>
+      <div class="pill" onclick="selectPill('tone',this,'Confrontational')">Confrontational <span style="font-size:10px;opacity:0.5">challenges their assumption</span></div>
+      <div class="pill" onclick="selectPill('tone',this,'Empathetic')">Empathetic <span style="font-size:10px;opacity:0.5">mirrors their frustration</span></div>
+      <div class="pill" onclick="selectPill('tone',this,'Absurdist')">Absurdist <span style="font-size:10px;opacity:0.5">unexpected, surreal</span></div>
+      <div class="pill" onclick="selectPill('tone',this,'Self-Aware')">Self-Aware <span style="font-size:10px;opacity:0.5">knows it's an ad</span></div>
+      <div class="pill" onclick="selectPill('tone',this,'Urgent')">Urgent <span style="font-size:10px;opacity:0.5">time-sensitive pressure</span></div>
+      <div class="pill" onclick="selectPillOther('tone',this)">Other…</div>
+      <div class="pill system" onclick="selectPill('tone',this,'__system__')">System decides</div>
+    </div>
+    <div id="tone-other-wrap" style="display:none;margin-top:8px">
+      <input class="opt-input" id="tone-other-input" placeholder="Describe the tone…" oninput="sel.tone=this.value" style="width:320px">
+    </div>
+  </div>
+
+  <!-- PRODUCTION + VISUAL -->
+  <div class="two-col">
+    <div class="section">
+      <div class="section-label">Production Method</div>
+      <div class="pills" id="prodPills">
+        <div class="pill" onclick="selectPill('prod',this,'AI-Generated')">AI-Generated</div>
+        <div class="pill" onclick="selectPill('prod',this,'Live Shoot')">Live Shoot</div>
+        <div class="pill" onclick="selectPill('prod',this,'Motion Design')">Motion Design</div>
+        <div class="pill" onclick="selectPill('prod',this,'Stock')">Stock</div>
+        <div class="pill" onclick="selectPill('prod',this,'Mixed')">Mixed</div>
+        <div class="pill" onclick="selectPill('prod',this,'Influencer')">Influencer</div>
+        <div class="pill system" onclick="selectPill('prod',this,'__system__')">System decides</div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-label">Visual Style</div>
+      <div class="pills" id="visPills">
+        <div class="pill" onclick="selectPill('vis',this,'Cinematic')">Cinematic</div>
+        <div class="pill" onclick="selectPill('vis',this,'Handheld / Doc')">Handheld / Doc</div>
+        <div class="pill" onclick="selectPill('vis',this,'Talking Head')">Talking Head</div>
+        <div class="pill" onclick="selectPill('vis',this,'Typography-Led')">Typography-Led</div>
+        <div class="pill" onclick="selectPill('vis',this,'Split Screen')">Split Screen</div>
+        <div class="pill" onclick="selectPill('vis',this,'Screen / UI')">Screen / UI</div>
+        <div class="pill system" onclick="selectPill('vis',this,'__system__')">System decides</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="brief-divider"></div>
+
+  <!-- HOOK SHAPE -->
+  <div class="section">
+    <div class="section-label">Hook Shape <span style="font-size:10px;text-transform:none;letter-spacing:0;color:var(--muted2);font-weight:400">— how it opens (optional)</span></div>
+    <div class="pills" id="hookPills">
+      <div class="pill" onclick="selectPill('hook',this,'Pattern interrupt')">Pattern interrupt <span style="font-size:10px;opacity:0.5">breaks the scroll reflex</span></div>
+      <div class="pill" onclick="selectPill('hook',this,'Bold claim')">Bold claim <span style="font-size:10px;opacity:0.5">audacious opening statement</span></div>
+      <div class="pill" onclick="selectPill('hook',this,'Direct question')">Direct question <span style="font-size:10px;opacity:0.5">aimed right at the operator</span></div>
+      <div class="pill" onclick="selectPill('hook',this,'Stat or data')">Stat or data <span style="font-size:10px;opacity:0.5">a number that lands like a punch</span></div>
+      <div class="pill" onclick="selectPill('hook',this,'Relatable moment')">Relatable moment <span style="font-size:10px;opacity:0.5">they've been here before</span></div>
+      <div class="pill" onclick="selectPill('hook',this,'Contrast')">Contrast <span style="font-size:10px;opacity:0.5">two things that don't belong together</span></div>
+      <div class="pill system" onclick="selectPill('hook',this,'__system__')">System decides</div>
+    </div>
+  </div>
+
+  <!-- VOICE -->
+  <div class="section">
+    <div class="section-label">Voice <span style="font-size:10px;text-transform:none;letter-spacing:0;color:var(--muted2);font-weight:400">— who's talking (optional)</span></div>
+    <div class="pills" id="voicePills">
+      <div class="pill" onclick="selectPill('voice',this,'operator-to-operator')">Operator-to-operator <span style="font-size:10px;opacity:0.5">peer talking to peer</span></div>
+      <div class="pill" onclick="selectPill('voice',this,'brand')">Brand voice <span style="font-size:10px;opacity:0.5">Mudflap speaking directly</span></div>
+      <div class="pill" onclick="selectPill('voice',this,'narrator')">Narrator <span style="font-size:10px;opacity:0.5">third-person voiceover</span></div>
+      <div class="pill system" onclick="selectPill('voice',this,'__system__')">System decides</div>
+    </div>
+  </div>
+
+  <!-- STRUCTURAL DEVICES -->
+  <div class="section">
+    <div class="section-label">Structural Devices <span style="font-size:10px;text-transform:none;letter-spacing:0;color:var(--muted2);font-weight:400">— layer any of these in (all off by default)</span></div>
+    <div class="toggles">
+      <div class="toggle-item" onclick="toggleMod('contrast',this)">
+        <div class="toggle-track"><div class="toggle-thumb"></div></div>
+        <div class="toggle-label">Before / after contrast</div>
+      </div>
+      <div class="toggle-item" onclick="toggleMod('math',this)">
+        <div class="toggle-track"><div class="toggle-thumb"></div></div>
+        <div class="toggle-label">Show the math <span style="font-size:11px;font-weight:400;opacity:0.6">— make savings concrete with numbers</span></div>
+      </div>
+      <div class="toggle-item" onclick="toggleMod('humor',this)">
+        <div class="toggle-track"><div class="toggle-thumb"></div></div>
+        <div class="toggle-label">Humor beat <span style="font-size:11px;font-weight:400;opacity:0.6">— earn a laugh before you sell</span></div>
+      </div>
+      <div class="toggle-item" onclick="toggleMod('selfaware',this)">
+        <div class="toggle-track"><div class="toggle-thumb"></div></div>
+        <div class="toggle-label">Self-aware <span style="font-size:11px;font-weight:400;opacity:0.6">— the ad knows it's an ad</span></div>
+      </div>
+      <div class="toggle-item" onclick="toggleMod('urgency',this)">
+        <div class="toggle-track"><div class="toggle-thumb"></div></div>
+        <div class="toggle-label">Urgency CTA <span style="font-size:11px;font-weight:400;opacity:0.6">— act now, not later</span></div>
+      </div>
+      <div class="toggle-item" onclick="toggleMod('socialproof',this)">
+        <div class="toggle-track"><div class="toggle-thumb"></div></div>
+        <div class="toggle-label">Social proof <span style="font-size:11px;font-weight:400;opacity:0.6">— a real operator result anchors the claim</span></div>
+      </div>
+      <div class="toggle-item" onclick="toggleMod('mythbust',this)">
+        <div class="toggle-track"><div class="toggle-thumb"></div></div>
+        <div class="toggle-label">Myth-busting <span style="font-size:11px;font-weight:400;opacity:0.6">— open by killing a belief they hold</span></div>
+      </div>
+      <div class="toggle-item" onclick="toggleMod('inaction',this)">
+        <div class="toggle-track"><div class="toggle-thumb"></div></div>
+        <div class="toggle-label">Cost of inaction <span style="font-size:11px;font-weight:400;opacity:0.6">— make doing nothing feel expensive</span></div>
+      </div>
+      <div class="toggle-item" onclick="toggleMod('specific',this)">
+        <div class="toggle-track"><div class="toggle-thumb"></div></div>
+        <div class="toggle-label">Specificity spike <span style="font-size:11px;font-weight:400;opacity:0.6">— one hyper-real detail (a route, a number, a place)</span></div>
+      </div>
+      <div class="toggle-item" onclick="toggleMod('escalate',this)">
+        <div class="toggle-track"><div class="toggle-thumb"></div></div>
+        <div class="toggle-label">Problem escalation <span style="font-size:11px;font-weight:400;opacity:0.6">— it gets worse before it gets better</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="brief-divider"></div>
+
+  <div id="bumper-notice" style="display:none;background:#fffbeb;border:1.5px solid #fcd34d;border-radius:8px;padding:10px 14px;font-size:12px;color:#92400e;line-height:1.6;margin-bottom:20px">
+    <strong>YouTube Bumper selected.</strong> The 5-scene structure and structural devices still inform the AI's thinking, but the output will be a single 6-second line + visual — not a multi-scene script. Fill in the insight and hypothesis; skip the scene-level controls.
+  </div>
+
+  <!-- CORE INSIGHT -->
+  <div class="section">
+    <div class="section-label">Core Insight</div>
+    <div class="helper">The truth your audience already feels but hasn't articulated. The more specific, the stronger the output — avoid generalities like "operators want to save money."</div>
+    <textarea class="insight-input" id="insight" placeholder="e.g. Fleet managers know they're getting squeezed on fuel but can't pinpoint where it's leaking — so they feel powerless to fix it." rows="3"></textarea>
+  </div>
+
+  <!-- HYPOTHESIS -->
+  <div class="section">
+    <div class="section-label">Hypothesis <span style="font-size:10px;text-transform:none;letter-spacing:0;color:var(--muted2);font-weight:400">— optional, but sharpens the output</span></div>
+    <div class="helper">Finish the sentence. Forces you to think about what this ad actually needs to do to someone's brain.</div>
+    <div class="hyp-row">
+      <span class="hyp-text">If our audience is</span>
+      <input class="hyp-input" id="hyp-a" placeholder="e.g. cost-blind and frustrated">
+      <span class="hyp-text">, then the hook needs to make them</span>
+      <input class="hyp-input" id="hyp-b" placeholder="e.g. feel the exact dollar amount they're losing">
+    </div>
+  </div>
+
+  <!-- NOTES -->
+  <div class="section">
+    <div class="section-label">Notes / Context <span style="font-size:10px;text-transform:none;letter-spacing:0;color:var(--muted2);font-weight:400">— optional</span></div>
+    <input type="text" class="opt-input" id="notes" placeholder="Brief / Pillar, specific data points, things to avoid, offer details…" style="width:100%">
+  </div>
+
+  <div id="valNote" class="val-note">Please select a Channel, Funnel Stage, Job, and enter a Core Insight before generating.</div>
+  <button class="gen-btn" id="genBtn" onclick="generate()">GENERATE 3 ADS</button>
+
+  <div id="outputArea"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SB_URL='https://fngxmhqkowrkzpgcofbn.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZuZ3htaHFrb3dya3pwZ2NvZmJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODQ3ODgsImV4cCI6MjA5MDU2MDc4OH0.rjLoi5Pz4d5UP_XF3AnxJ2ViY-jxpetwz_U7tWPWsoo';
+const sb=supabase.createClient(SB_URL,SB_KEY);
+
+const sel={channel:'',stage:'',job:'',cta:'',tone:'',prod:'',vis:'',hook:'',voice:''};
+const mods={contrast:false,math:false,humor:false,selfaware:false,urgency:false,socialproof:false,mythbust:false,inaction:false,specific:false,escalate:false};
+let generatedAds=[],editMode={},status={};  // status[i]: undefined | "saved" | "retired"
+
+function selectTile(key,el,val){
+  const already=el.classList.contains('selected');
+  el.closest('.tiles').querySelectorAll('.tile').forEach(t=>t.classList.remove('selected'));
+  if(already){ sel[key]=''; } else { el.classList.add('selected'); sel[key]=val; }
+}
+function selectPill(key,el,val){
+  const already=el.classList.contains('selected');
+  el.closest('.pills').querySelectorAll('.pill').forEach(p=>p.classList.remove('selected'));
+  if(already){
+    sel[key]='';
+    const w=document.getElementById(key+'-other-wrap');
+    if(w) w.style.display='none';
+  } else {
+    el.classList.add('selected'); sel[key]=val;
+    const w=document.getElementById(key+'-other-wrap');
+    if(w) w.style.display='none';
+  }
+}
+function selectPillOther(key,el){
+  const already=el.classList.contains('selected');
+  el.closest('.pills').querySelectorAll('.pill').forEach(p=>p.classList.remove('selected'));
+  const w=document.getElementById(key+'-other-wrap');
+  if(already){
+    sel[key]='';
+    if(w) w.style.display='none';
+  } else {
+    el.classList.add('selected'); sel[key]='';
+    if(w){ w.style.display='block'; const i=document.getElementById(key+'-other-input'); if(i){i.focus();sel[key]=i.value;} }
+  }
+}
+function toggleMod(key,el){ mods[key]=!mods[key]; el.classList.toggle('on',mods[key]); }
+
+const CHANNELS={
+  meta:{
+    name:'Meta',
+    note:'Primary text: 125 chars max · No headline field for Reels · Hook must land in 0–2s · Vertical 9:16',
+    structure:'5-scene Reel (Hook 0–2s → Problem 2–5s → Insight 5–8s → Solution 8–12s → CTA 12–15s)',
+    copyFields:['Primary Text (125 chars max)'],
+    toneNote:'',
+    sceneCount:5,
+    isBumper:false
+  },
+  tiktok:{
+    name:'TikTok',
+    note:'Primary text: 100 chars max · No headline · Hook must land in 0–2s · Native/raw tone outperforms polished · Vertical 9:16 · ⚠ Verify current In-Feed specs at ads.tiktok.com',
+    structure:'5-scene In-Feed video (Hook 0–2s → Problem 2–5s → Insight 5–8s → Solution 8–12s → CTA 12–15s)',
+    copyFields:['Primary Text (100 chars max)'],
+    toneNote:'TikTok skews raw and native — avoid anything that feels like a TV spot. Speak like a real person.',
+    sceneCount:5,
+    isBumper:false
+  },
+  youtube_instream:{
+    name:'YouTube In-Stream',
+    note:'Skippable after 5s · Hook window is 0–5s (longer than Meta) · 15–30s sweet spot · No primary text field — video is the ad · ⚠ Verify current specs at support.google.com/google-ads',
+    structure:'5-scene skippable video (Hook 0–5s → Problem 5–10s → Insight 10–18s → Solution 18–25s → CTA 25–30s)',
+    copyFields:['Companion Banner headline (optional, ~25 chars)'],
+    toneNote:'The skip button appears at 5s — the hook must be strong enough to earn the next 25 seconds. Front-load the tension.',
+    sceneCount:5,
+    isBumper:false
+  },
+  youtube_bumper:{
+    name:'YouTube Bumper',
+    note:'Non-skippable · Exactly 6 seconds · One thought, one visual · No scene structure · Brand recall play, not conversion · ⚠ Verify current specs at support.google.com/google-ads',
+    structure:'Single bumper (one VO line + one visual — must land the entire idea in 6 seconds)',
+    copyFields:['No copy fields — video only'],
+    toneNote:'No time to build. One punchy line that plants a thought. Think billboard, not story.',
+    sceneCount:1,
+    isBumper:true
+  },
+  linkedin:{
+    name:'LinkedIn',
+    note:'Intro text: 150 chars shown, 600 max · Headline: 70 chars · Description: 100 chars · Audience is in work mode — more open to business-case framing · ⚠ Verify video vs. image ad copy fields at business.linkedin.com',
+    structure:'5-scene video (Hook 0–2s → Problem 2–5s → Insight 5–8s → Solution 8–12s → CTA 12–15s) + intro text, headline, description',
+    copyFields:['Intro Text (150 chars shown / 600 max)','Headline (70 chars max)','Description (100 chars max)'],
+    toneNote:'LinkedIn audience is in a professional headset. Business-case framing works here — ROI, efficiency, competitive advantage. Less raw, more credible.',
+    sceneCount:5,
+    isBumper:false
+  }
+};
+
+function selectChannel(el,key){
+  const already=el.classList.contains('selected');
+  el.closest('.tiles').querySelectorAll('.tile').forEach(t=>t.classList.remove('selected'));
+  const note=document.getElementById('channel-spec-note');
+  if(already){
+    sel.channel='';
+    note.style.display='none';
+  } else {
+    el.classList.add('selected');
+    sel.channel=key;
+    const ch=CHANNELS[key];
+    note.style.display='block';
+    note.innerHTML=`<strong style="color:var(--text)">${ch.name} specs</strong> &nbsp;·&nbsp; ${ch.note}`;
+    // Show/hide bumper notice on scene section
+    const bumperNotice=document.getElementById('bumper-notice');
+    if(bumperNotice) bumperNotice.style.display=ch.isBumper?'block':'none';
+  }
+}
+
+function toast(msg,type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast show'+(type?' '+type:'');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+function getModifierString(){
+  const parts=[];
+  if(sel.hook) parts.push('Hook shape: '+sel.hook);
+  if(sel.voice) parts.push('Voice: '+({'operator-to-operator':'operator-to-operator — a peer talking to a peer, not a brand voice','brand':'Mudflap brand voice speaking directly to the operator','narrator':'third-person narrator voiceover'}[sel.voice]||sel.voice));
+  const tm={
+    contrast:'Structure around a before/after contrast',
+    math:'Show the math — make savings concrete with specific real numbers',
+    humor:'Include a humor beat — earn a laugh before you sell',
+    selfaware:'Make it self-aware — the ad acknowledges it is an ad',
+    urgency:'Close with urgency — give a specific reason to act now not later',
+    socialproof:'Anchor a claim with a real operator result or reaction — make it feel earned not asserted',
+    mythbust:'Open by killing a belief the audience holds — name the myth then destroy it',
+    inaction:'Make doing nothing feel expensive — the cost of not acting should be visceral',
+    specific:'Use a specificity spike — one hyper-real detail (a specific route, truck stop, dollar amount, date) that makes it feel real not generic',
+    escalate:'Escalate the problem before solving it — let tension build through scenes 1-3 before the relief lands'
+  };
+  Object.entries(mods).filter(([,v])=>v).forEach(([k])=>{ if(tm[k]) parts.push(tm[k]); });
+  return parts.length?'\nCreative modifiers:\n- '+parts.join('\n- '):'';
+}
+
+function getCTALine(){
+  if(!sel.cta||sel.cta==='none') return 'No CTA — do NOT end with a call to action. Let the ad land without a click prompt.';
+  return 'CTA: drive toward "'+sel.cta+'" — the final scene should make this action feel obvious and low-friction.';
+}
+
+async function generate(){
+  if(!sel.channel||!sel.stage||!sel.job||!document.getElementById('insight').value.trim()){
+    document.getElementById('valNote').style.display='block'; return;
+  }
+  document.getElementById('valNote').style.display='none';
+  const insight=document.getElementById('insight').value.trim();
+  const hypA=(document.getElementById('hyp-a')?.value||'').trim();
+  const hypB=(document.getElementById('hyp-b')?.value||'').trim();
+  const hypothesis=hypA&&hypB?`If our audience is "${hypA}", then the hook needs to make them "${hypB}".`:'';
+  const notes=document.getElementById('notes').value.trim();
+  generatedAds=[]; editMode={}; status={};
+  document.getElementById('genBtn').disabled=true;
+  document.getElementById('outputArea').innerHTML=`<div class="output-section"><div class="generating"><div class="gen-bars"><div class="gen-bar"></div><div class="gen-bar"></div><div class="gen-bar"></div><div class="gen-bar"></div><div class="gen-bar"></div></div><div class="gen-label">Writing 3 ads…</div></div></div>`;
+
+  const ch=CHANNELS[sel.channel]||CHANNELS.meta;
+  const ctaLine=getCTALine();
+  const modStr=getModifierString();
+
+  let prompt;
+  if(ch.isBumper){
+    prompt=`You are a senior creative director writing YouTube Bumper ads for Mudflap, a fuel savings app for heavy-haul fleet managers (5+ trucks). Bumpers are 6 seconds, non-skippable. One thought. One visual. Think billboard, not story.
+
+BRIEF:
+- Funnel stage: ${sel.stage}
+- Job-to-be-done: ${sel.job}
+- Core insight: "${insight}"
+- Tone: ${!sel.tone||sel.tone==='__system__'?'choose the most arresting tone for a 6-second format':sel.tone}
+- Visual style: ${!sel.vis||sel.vis==='__system__'?'choose the most striking visual for a 6-second format':sel.vis}
+${hypothesis?'- Hypothesis: '+hypothesis:''}
+${notes?'- Additional context: '+notes:''}
+
+Write 3 completely different 6-second bumper ads. Each must land a single idea in one line. No scene structure — just one VO line and one visual prompt per bumper.
+
+Respond ONLY in this exact JSON, no preamble, no fences:
+{"ads":[{"hookType":"...","scenes":[{"name":"Bumper","timing":"0–6s","vo":"...","prompt":"..."}],"primaryText":""}]}`;
+  } else {
+    const structure=ch.structure;
+    const toneNote=ch.toneNote?'\n- Channel tone note: '+ch.toneNote:'';
+    const copyNote=ch.copyFields.join(' · ');
+    const isLinkedIn=sel.channel==='linkedin';
+    const isTikTok=sel.channel==='tiktok';
+    const isYT=sel.channel==='youtube_instream';
+
+    let sceneStructure, jsonStructure, copyInstruction;
+    if(isYT){
+      sceneStructure=`- Hook (0–5s): must be strong enough to survive the skip button — this is longer than Meta, use it
+- Problem (5–10s): the tension they already feel
+- Insight (10–18s): the reframe
+- Solution (18–25s): how Mudflap fixes it, specifically
+- CTA (25–30s): ${!sel.cta||sel.cta==='none'?'a final thought — no call to action':'drive toward: '+sel.cta}`;
+      jsonStructure='{"name":"Hook","timing":"0–5s","vo":"...","prompt":"..."},{"name":"Problem","timing":"5–10s","vo":"...","prompt":"..."},{"name":"Insight","timing":"10–18s","vo":"...","prompt":"..."},{"name":"Solution","timing":"18–25s","vo":"...","prompt":"..."},{"name":"CTA","timing":"25–30s","vo":"...","prompt":"..."}';
+      copyInstruction='No primary text field for YouTube — video is the ad. Set primaryText to empty string.';
+    } else if(isLinkedIn){
+      sceneStructure=`- Hook (0–2s): stops the scroll — but this audience is in work mode, so the hook can be more direct and business-forward
+- Problem (2–5s): the operational pain they feel
+- Insight (5–8s): the reframe
+- Solution (8–12s): how Mudflap fixes it, with business-case framing
+- CTA (12–15s): ${!sel.cta||sel.cta==='none'?'a final thought — no call to action':'drive toward: '+sel.cta}`;
+      jsonStructure='{"name":"Hook","timing":"0–2s","vo":"...","prompt":"..."},{"name":"Problem","timing":"2–5s","vo":"...","prompt":"..."},{"name":"Insight","timing":"5–8s","vo":"...","prompt":"..."},{"name":"Solution","timing":"8–12s","vo":"...","prompt":"..."},{"name":"CTA","timing":"12–15s","vo":"...","prompt":"..."}';
+      copyInstruction='For each ad write: introText (max 150 chars, shown before see more), headline (max 70 chars), description (max 100 chars). Put introText in primaryText field, headline in hookType field suffix like "Bold Claim | Headline: Save $400 this month", description in a note.';
+    } else {
+      sceneStructure=`- Hook (0–2s): stops the scroll
+- Problem (2–5s): tension they already feel
+- Insight (5–8s): the reframe — what they haven't connected yet
+- Solution (8–12s): how Mudflap fixes it, specifically
+- CTA (12–15s): ${!sel.cta||sel.cta==='none'?'a final thought — no call to action':'drive toward: '+sel.cta}`;
+      jsonStructure='{"name":"Hook","timing":"0–2s","vo":"...","prompt":"..."},{"name":"Problem","timing":"2–5s","vo":"...","prompt":"..."},{"name":"Insight","timing":"5–8s","vo":"...","prompt":"..."},{"name":"Solution","timing":"8–12s","vo":"...","prompt":"..."},{"name":"CTA","timing":"12–15s","vo":"...","prompt":"..."}';
+      const charLimit=isTikTok?100:125;
+      copyInstruction=`Primary Text: max ${charLimit} chars, hook-first, ${!sel.cta||sel.cta==='none'?'no CTA':'ends with the CTA'}, no hashtags.`;
+    }
+
+    prompt=`You are a senior creative director writing ${ch.name} ads for Mudflap, a fuel savings app for heavy-haul fleet managers (5+ trucks). These operators are skeptical, time-pressed, and have seen every vendor pitch. Write to them like a peer, not a salesperson.
+
+BRIEF:
+- Channel: ${ch.name}
+- Funnel stage: ${sel.stage}
+- Job-to-be-done: ${sel.job}
+- Core insight: "${insight}"
+- Tone: ${!sel.tone||sel.tone==='__system__'?'choose the most effective tone for this brief and channel':sel.tone}
+- Production method: ${!sel.prod||sel.prod==='__system__'?'choose the best method':sel.prod}
+- Visual style: ${!sel.vis||sel.vis==='__system__'?'choose the most effective visual style':sel.vis}
+- ${ctaLine}${toneNote}
+${hypothesis?'- Hypothesis: '+hypothesis:''}${modStr}
+${notes?'- Additional context: '+notes:''}
+
+Write 3 complete ads. Each uses a DIFFERENT hook type — no two hooks can use the same emotional approach.
+
+Scene structure:
+${sceneStructure}
+
+Every scene: VO/on-screen text line + visual/AI prompt (specific, production-ready, not generic).
+${copyInstruction}
+
+Respond ONLY in this exact JSON, no preamble, no fences:
+{"ads":[{"hookType":"...","scenes":[${jsonStructure}],"primaryText":"..."}]}`;
+  }
+
+  try{
+    const res=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,messages:[{role:'user',content:prompt}]})});
+    const data=await res.json();
+    const raw=data.content?.find(b=>b.type==='text')?.text||data.content?.[0]?.text||'';
+    generatedAds=JSON.parse(raw.replace(/```json|```/g,'').trim()).ads;
+    renderAds();
+  }catch(e){
+    document.getElementById('outputArea').innerHTML=`<div class="output-section"><div class="error-box">Generation failed: ${e.message}. Try again.</div></div>`;
+  }
+  document.getElementById('genBtn').disabled=false;
+}
+
+const SC={Hook:'hook',Problem:'problem',Insight:'insight',Solution:'solution',CTA:'cta'};
+
+function renderAds(){
+  document.getElementById('outputArea').innerHTML=`
+  <div class="output-section">
+    <div class="output-title">3 ADS GENERATED</div>
+    <div class="output-subtitle">Edit inline, then approve to send to pipeline</div>
+    <div class="ads-grid">${generatedAds.map((ad,i)=>adCard(ad,i)).join('')}</div>
+  </div>`;
+}
+
+function adCard(ad,i){
+  const ed=editMode[i],hook=ad.scenes[0];
+  const scenes=ad.scenes.map((s,si)=>`
+    <div class="scene-row">
+      <div class="scene-label ${SC[s.name]||''}">${s.name} · ${s.timing}</div>
+      ${ed
+        ?`<textarea class="scene-vo-edit" id="vo-${i}-${si}" rows="2">${esc(s.vo)}</textarea><textarea class="scene-vo-edit" id="pr-${i}-${si}" rows="2" style="margin-top:4px;color:var(--muted);font-style:italic">${esc(s.prompt)}</textarea>`
+        :`<div class="scene-vo">${esc(s.vo)}</div><div class="scene-prompt">${esc(s.prompt)}</div>`}
+    </div>`).join('');
+  return`<div class="ad-card" id="card-${i}">
+    <div class="ad-card-top">
+      <div class="ad-num">Ad ${i+1}</div>
+      <div class="ad-hook-type">${esc(ad.hookType)}</div>
+      <div class="ad-hook-line">${esc(hook?.vo||'')}</div>
+    </div>
+    <div class="ad-scenes">${scenes}</div>
+    <div class="ad-meta-section">
+      <div class="meta-label-sm">Primary Text</div>
+      ${ed?`<textarea class="meta-edit" id="pt-${i}" rows="3">${esc(ad.primaryText)}</textarea>`:`<div class="meta-value">${esc(ad.primaryText)}</div>`}
+    </div>
+    <div class="ad-actions">
+      <button class="btn-edit ${ed?'active':''}" onclick="toggleEdit(${i})">${ed?'Done':'Edit'}</button>
+      ${status[i]==='saved'
+        ?'<button class="btn-saved" disabled>✓ Saved to pipeline</button>'
+        :status[i]==='retired'
+        ?'<button class="btn-retired" disabled>✗ Retired</button>'
+        :`<button class="btn-retire" onclick="retireAd(${i})">Retire</button>
+         <button class="btn-approve" onclick="approveAd(${i})">Save →</button>`}
+    </div>
+  </div>`;
+}
+
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function toggleEdit(i){
+  if(editMode[i]){
+    generatedAds[i].scenes.forEach((s,si)=>{
+      const v=document.getElementById(`vo-${i}-${si}`),p=document.getElementById(`pr-${i}-${si}`);
+      if(v)s.vo=v.value; if(p)s.prompt=p.value;
+    });
+    const pt=document.getElementById(`pt-${i}`);
+    if(pt)generatedAds[i].primaryText=pt.value;
+    editMode[i]=false;
+  }else{ editMode[i]=true; }
+  renderAds();
+}
+
+function buildRow(ad, pipelineStatus){
+  const scenes=[
+    {id:'ha',label:'Scene 1 — Hook A',timing:'0–2s',wc:'~5 words',vo:ad.scenes[0]?.vo||'',prompt:ad.scenes[0]?.prompt||''},
+    {id:'hb',label:'Scene 1 — Hook B',timing:'0–2s',wc:'~5 words',vo:'',prompt:''},
+    {id:'hc',label:'Scene 1 — Hook C',timing:'0–2s',wc:'~5 words',vo:'',prompt:''},
+    {id:'pr',label:'Scene 2 — Problem',timing:'2–5s',wc:'~8 words',vo:ad.scenes[1]?.vo||'',prompt:ad.scenes[1]?.prompt||''},
+    {id:'ins',label:'Scene 3 — Insight',timing:'5–8s',wc:'~8 words',vo:ad.scenes[2]?.vo||'',prompt:ad.scenes[2]?.prompt||''},
+    {id:'sol',label:'Scene 4 — Solution',timing:'8–12s',wc:'~10 words',vo:ad.scenes[3]?.vo||'',prompt:ad.scenes[3]?.prompt||''},
+    {id:'ct',label:'Scene 5 — CTA',timing:'12–15s',wc:'~8 words',vo:ad.scenes[4]?.vo||'',prompt:ad.scenes[4]?.prompt||''}
+  ];
+  const notesParts=[document.getElementById('notes').value.trim()];
+  if(sel.cta&&sel.cta!=='none') notesParts.push('CTA: '+sel.cta);
+  if(sel.channel) notesParts.push('Channel: '+(CHANNELS[sel.channel]?.name||sel.channel));
+  return {
+    concept:`${ad.hookType} — ${document.getElementById('insight').value.trim().slice(0,40)}…`,
+    funnel_stage:sel.stage, job:sel.job,
+    format:sel.channel==='youtube_bumper'?'Bumper':sel.channel==='linkedin'?'Video':sel.channel==='youtube_instream'?'Video (Feed)':'Reel',
+    tone:!sel.tone||sel.tone==='__system__'?'System':sel.tone,
+    production_method:!sel.prod||sel.prod==='__system__'?'System':sel.prod,
+    visual_style:!sel.vis||sel.vis==='__system__'?'System':sel.vis,
+    status:pipelineStatus,
+    core_insight:document.getElementById('insight').value.trim(),
+    hypothesis:(()=>{const a=(document.getElementById('hyp-a')?.value||'').trim(),b=(document.getElementById('hyp-b')?.value||'').trim();return a&&b?a+'||'+b:'';})(),
+    notes:notesParts.filter(Boolean).join(' | '),
+    scenes,
+    meta_copy:{primaryText:ad.primaryText,headline:'',description:'',displayUrl:''},
+    metrics:{thumbStop:'',viewRate:'',completionRate:'',ctr:'',cpa:'',notes:''},
+    primary_text:ad.primaryText||''
+  };
+}
+
+async function approveAd(i){
+  const ad=generatedAds[i];
+  const btn=document.querySelector(`#card-${i} .btn-approve`);
+  if(btn){btn.disabled=true;btn.textContent='Saving…';}
+  try{
+    const{error}=await sb.from('ads').insert(buildRow(ad,'Waiting for Review'));
+    if(error) throw new Error(error.message);
+    status[i]='saved';
+    toast('Saved to pipeline ✓','success');
+    renderAds();
+  }catch(e){
+    toast('Save failed: '+e.message);
+    if(btn){btn.disabled=false;btn.textContent='Save →';}
+  }
+}
+
+async function retireAd(i){
+  const ad=generatedAds[i];
+  const btn=document.querySelector(`#card-${i} .btn-retire`);
+  if(btn){btn.disabled=true;btn.textContent='Retiring…';}
+  try{
+    const{error}=await sb.from('ads').insert(buildRow(ad,'Retired'));
+    if(error) throw new Error(error.message);
+    status[i]='retired';
+    toast('Retired','');
+    renderAds();
+  }catch(e){
+    toast('Save failed: '+e.message);
+    if(btn){btn.disabled=false;btn.textContent='Retire';}
+  }
+}
+</script>
+</body>
+</html>
