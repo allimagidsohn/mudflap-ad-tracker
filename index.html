@@ -526,8 +526,8 @@ function adCard(a){
     return map[s.id]||s.label||s.id;
   };
 
-  // VIEW mode expanded content
-  const viewExpanded=open&&!isEditing?`<div class="card-expanded">
+  // Shared ad content — shown in view mode AND at top of edit mode
+  const adContent=`<div class="card-expanded">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
       <span style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);">Brief Details</span>
       <button class="card-export-btn" onclick="event.stopPropagation();exportOneCSV('${a.id}')">↓ Export this ad</button>
@@ -560,7 +560,10 @@ function adCard(a){
           <button class="copy-btn" onclick="cpTxt(this,'${v.replace(/'/g,"&#39;")}')">Copy</button>
         </div>`).join('')}
     </div>`:''}
-  </div>`:'';
+  </div>`;
+
+  // Show ad content in view mode (expanded, not editing), OR always when editing
+  const viewExpanded=(open&&!isEditing)||isEditing ? adContent : '';
 
   // REVISION NOTES section (always visible when status = Needs Revision)
   const revisionSection=isRevision?`<div class="revision-section" onclick="event.stopPropagation()">
@@ -578,7 +581,8 @@ function adCard(a){
   // EDIT mode
   const editSection=isEditing?`<div class="edit-section" onclick="event.stopPropagation()">
     <div class="edit-section-head">
-      <span>Editing Brief</span>
+      <span>✎ Edit Fields Below</span>
+      <span style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0;text-transform:none;">Ad content shown above for reference</span>
     </div>
     <div class="edit-grid">
       <div class="edit-field full">
