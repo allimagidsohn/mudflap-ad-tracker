@@ -140,9 +140,9 @@ body {
 
 .card-main {
   display: flex; align-items: flex-start;
-  padding: 14px 18px; gap: 14px; cursor: pointer;
+  padding: 14px 18px; gap: 14px;
 }
-.card-body { flex: 1; min-width: 0; }
+.card-body { flex: 1; min-width: 0; cursor: pointer; }
 .card-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; align-items: center; }
 .card-title { font-size: 14px; font-weight: 600; color: var(--text); }
 .card-insight { font-size: 12px; color: var(--muted); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -643,8 +643,8 @@ function adCard(a){
   </div>`:'';
 
   return`<div class="ad-card ${isRevision?'revision':''}" id="card-${a.id}">
-    <div class="card-main" onclick="if(event.target===this||event.target.closest('.card-body'))togExp('${a.id}')">
-      <div class="card-body">
+    <div class="card-main">
+      <div class="card-body" onclick="togExp('${a.id}')">
         <div class="card-pills">
           <span class="pill ${statusPillClass(a.status)}">${a.status}</span>
           ${a.funnelStage?`<span class="pill stage-pill">${a.funnelStage}</span>`:''}
@@ -654,7 +654,7 @@ function adCard(a){
         <div class="card-title">${esc(a.concept||'Untitled')}</div>
         ${a.coreInsight?`<div class="card-insight">${esc(a.coreInsight)}</div>`:''}
       </div>
-      <div class="card-actions" onclick="event.stopPropagation()">
+      <div class="card-actions">
         <select class="status-select" onchange="doStatus('${a.id}',this.value)">
           ${STAGES.map(s=>`<option value="${s.key}" ${a.status===s.key?'selected':''}>${s.key}</option>`).join('')}
         </select>
@@ -676,7 +676,7 @@ function cpTxt(btn,txt){
 
 window.setStage=s=>{activeStage=s;render();};
 window.togExp=id=>{
-  if(editingId===id)return; // don't collapse while editing
+  if(editingId===id)return;
   expanded.has(id)?expanded.delete(id):expanded.add(id);
   render();
 };
