@@ -227,6 +227,22 @@ body {
 }
 .edit-select option { background: #fff; }
 .edit-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px; }
+.edit-scenes-section { margin-top: 4px; }
+.edit-scene-block {
+  margin-bottom: 14px; padding: 12px; border-radius: 8px;
+  background: var(--surface2); border: 1px solid var(--border);
+}
+.edit-scene-label {
+  font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+  font-weight: 600; margin-bottom: 8px;
+}
+.edit-scene-label.hook { color: var(--blue); }
+.edit-scene-label.problem { color: var(--orange); }
+.edit-scene-label.insight { color: var(--teal); }
+.edit-scene-label.solution { color: var(--purple); }
+.edit-scene-label.cta { color: var(--red); }
+.edit-scene-vo { margin-bottom: 6px; }
+.edit-scene-sublbl { font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 3px; }
 .save-btn {
   font-size: 12px; padding: 7px 16px; border-radius: 6px;
   border: none; background: var(--accent); color: #fff;
@@ -636,6 +652,24 @@ function adCard(a){
         <input class="edit-input" id="edit-desc-${a.id}" value="${esc((a.metaCopy||{}).description||'')}">
       </div>
     </div>
+    ${(a.scenes||[]).length ? `<div class="edit-scenes-section">
+      <div class="section-head" style="margin-bottom:12px;">Script Direction — Edit Scenes</div>
+      ${(a.scenes||[]).map((s,si) => {
+        const scClass = {ha:'hook',hb:'hook',hc:'hook',pr:'problem',ins:'insight',sol:'solution',ct:'cta'}[s.id]||'';
+        const scName = {ha:'Hook A',hb:'Hook B',hc:'Hook C',pr:'Problem',ins:'Insight',sol:'Solution',ct:'CTA'}[s.id]||s.label||s.id;
+        return `<div class="edit-scene-block">
+          <div class="edit-scene-label ${scClass}">${scName}${s.timing ? ' · '+s.timing : ''}</div>
+          <div class="edit-scene-vo">
+            <div class="edit-scene-sublbl">VO / Copy</div>
+            <textarea class="edit-textarea" id="edit-scene-vo-${a.id}-${si}" style="min-height:56px">${esc(s.vo||'')}</textarea>
+          </div>
+          <div>
+            <div class="edit-scene-sublbl">Visual Direction</div>
+            <textarea class="edit-textarea" id="edit-scene-pr-${a.id}-${si}" style="min-height:48px;color:var(--muted)">${esc(s.prompt||'')}</textarea>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>` : ''}
     <div class="edit-actions" onclick="event.stopPropagation()">
       <button class="cancel-btn" onclick="cancelEdit('${a.id}')">Cancel</button>
       <button class="save-btn" onclick="saveEdit('${a.id}')">Save Changes</button>
@@ -699,6 +733,19 @@ window.cancelEdit=id=>{
 
 window.saveEdit=async id=>{
   const g=sel=>{ const el=document.getElementById(sel); return el?el.value:''; };
+  
+  // Collect updated scenes
+  const ad=ads.find(a=>a.id===id);
+  const updatedScenes=(ad?ad.scenes||[]:[ ]).map((s,si)=>{
+    const voEl=document.getElementById(`edit-scene-vo-${id}-${si}`);
+    const prEl=document.getElementById(`edit-scene-pr-${id}-${si}`);
+    return{
+      ...s,
+      vo:  voEl ? voEl.value : s.vo,
+      prompt: prEl ? prEl.value : s.prompt
+    };
+  });
+
   const updates={
     concept:      g(`edit-concept-${id}`),
     core_insight: g(`edit-insight-${id}`),
@@ -712,7 +759,8 @@ window.saveEdit=async id=>{
       primaryText: g(`edit-primary-${id}`),
       headline:    g(`edit-headline-${id}`),
       description: g(`edit-desc-${id}`)
-    }
+    },
+    scenes: updatedScenes
   };
   const{error}=await sb.from('ads').update(updates).eq('id',id);
   if(error){ toast('Save failed: '+error.message,'error'); return; }
@@ -727,7 +775,8 @@ window.saveEdit=async id=>{
     job:updates.job,
     productionMethod:updates.production_method,
     visualStyle:updates.visual_style,
-    metaCopy:updates.meta_copy
+    metaCopy:updates.meta_copy,
+    scenes:updatedScenes
   }:a);
   editingId=null;
   toast('Saved ✓','success');
