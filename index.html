@@ -48,10 +48,19 @@ body {
 .nav-divider { width: 1px; height: 20px; background: var(--border); margin-right: 6px; }
 .nav-links { display: flex; gap: 4px; }
 .nav-link { padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 500; color: var(--muted); text-decoration: none; transition: all 0.15s; }
-.nav-link:hover { color: var(--text); background: var(--surface2); }
-.nav-link.active { color: var(--text); background: var(--surface2); }
+.nav-link:hover { color: #fff; background: rgba(255,255,255,0.08); }
+.nav-link.active { color: #fff; background: rgba(255,255,255,0.08); }
 .nav-right { display: flex; align-items: center; gap: 12px; }
 .ad-count { font-size: 12px; color: var(--muted); }
+
+/* EXPORT BUTTON */
+.export-btn {
+  font-size: 12px; padding: 6px 14px; border-radius: 6px;
+  border: 1.5px solid var(--border); background: transparent;
+  color: var(--muted); cursor: pointer; transition: all 0.12s;
+  font-family: 'DM Sans', sans-serif; display: flex; align-items: center; gap: 6px;
+}
+.export-btn:hover { color: var(--accent); border-color: var(--accent-border); }
 
 /* STAGE TABS */
 .stage-bar {
@@ -100,7 +109,7 @@ body {
   background-repeat: no-repeat; background-position: right 10px center;
   padding-right: 28px;
 }
-.filter-select option { background: #1f1f1f; }
+.filter-select option { background: #fff; }
 .clear-btn {
   font-size: 12px; padding: 7px 12px; border-radius: 6px;
   border: 1.5px solid var(--border); background: transparent;
@@ -127,7 +136,7 @@ body {
   transition: border-color 0.15s;
 }
 .ad-card:hover { border-color: var(--border2); }
-.ad-card.winner { border-color: rgba(167,139,250,0.4); }
+.ad-card.revision { border-color: rgba(224,53,53,0.3); }
 
 .card-main {
   display: flex; align-items: flex-start;
@@ -149,7 +158,7 @@ body {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M1 1l3 3 3-3' stroke='%236b6b6b' stroke-width='1.2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat; background-position: right 7px center;
 }
-.status-select option { background: #1f1f1f; }
+.status-select option { background: #fff; }
 
 .icon-btn {
   width: 28px; height: 28px; border-radius: 6px;
@@ -160,17 +169,111 @@ body {
 }
 .icon-btn:hover { color: var(--text); border-color: var(--border2); }
 .icon-btn.danger:hover { color: var(--red); border-color: rgba(255,77,77,0.4); }
+.icon-btn.active-edit { color: var(--accent); border-color: var(--accent-border); background: var(--accent-dim); }
 
 /* EXPAND */
 .card-expanded {
   border-top: 1px solid var(--border);
   padding: 16px 18px;
-  background: rgba(0,0,0,0.2);
+  background: rgba(0,0,0,0.02);
 }
 .exp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
 .exp-field { }
 .exp-label { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 3px; }
 .exp-val { font-size: 12px; color: var(--text); line-height: 1.5; }
+
+/* INLINE EDIT */
+.edit-section {
+  border-top: 1px solid var(--border);
+  padding: 16px 18px;
+  background: rgba(29,185,84,0.03);
+}
+.edit-section-head {
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 12px; padding-bottom: 6px;
+  border-bottom: 1px solid var(--accent-border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.edit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.edit-field { display: flex; flex-direction: column; gap: 4px; }
+.edit-field.full { grid-column: 1 / -1; }
+.edit-lbl { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
+.edit-input {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 7px; padding: 8px 10px;
+  font-family: 'DM Sans', sans-serif; font-size: 13px;
+  color: var(--text); outline: none; width: 100%;
+  transition: border-color 0.15s;
+}
+.edit-input:focus { border-color: var(--accent); }
+.edit-textarea {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 7px; padding: 8px 10px;
+  font-family: 'DM Sans', sans-serif; font-size: 13px;
+  color: var(--text); outline: none; width: 100%;
+  resize: vertical; min-height: 72px; line-height: 1.5;
+  transition: border-color 0.15s;
+}
+.edit-textarea:focus { border-color: var(--accent); }
+.edit-select {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 7px; padding: 8px 10px;
+  font-family: 'DM Sans', sans-serif; font-size: 13px;
+  color: var(--text); outline: none; cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b6b6b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center;
+  padding-right: 28px; width: 100%;
+}
+.edit-select option { background: #fff; }
+.edit-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px; }
+.save-btn {
+  font-size: 12px; padding: 7px 16px; border-radius: 6px;
+  border: none; background: var(--accent); color: #fff;
+  cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 600;
+  transition: background 0.12s;
+}
+.save-btn:hover { background: var(--accent-dark); }
+.cancel-btn {
+  font-size: 12px; padding: 7px 14px; border-radius: 6px;
+  border: 1.5px solid var(--border); background: transparent;
+  color: var(--muted); cursor: pointer; font-family: 'DM Sans', sans-serif;
+  transition: all 0.12s;
+}
+.cancel-btn:hover { color: var(--text); }
+
+/* REVISION NOTES */
+.revision-section {
+  border-top: 1px solid rgba(224,53,53,0.2);
+  padding: 14px 18px;
+  background: rgba(224,53,53,0.03);
+}
+.revision-head {
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--red); margin-bottom: 8px;
+  display: flex; align-items: center; gap: 6px;
+}
+.revision-head::before { content: '⚑'; font-size: 11px; }
+.revision-textarea {
+  background: var(--surface); border: 1.5px solid rgba(224,53,53,0.3);
+  border-radius: 7px; padding: 10px 12px;
+  font-family: 'DM Sans', sans-serif; font-size: 13px;
+  color: var(--text); outline: none; width: 100%;
+  resize: vertical; min-height: 80px; line-height: 1.5;
+  transition: border-color 0.15s;
+}
+.revision-textarea:focus { border-color: var(--red); }
+.revision-textarea::placeholder { color: var(--muted2); }
+.revision-save-btn {
+  margin-top: 8px; font-size: 12px; padding: 6px 14px; border-radius: 6px;
+  border: 1.5px solid rgba(224,53,53,0.4); background: rgba(224,53,53,0.06);
+  color: var(--red); cursor: pointer; font-family: 'DM Sans', sans-serif;
+  font-weight: 600; transition: all 0.12s;
+}
+.revision-save-btn:hover { background: rgba(224,53,53,0.12); }
+.revision-saved-note {
+  font-size: 12px; color: var(--muted); font-style: italic; margin-top: 8px;
+}
 
 .scenes-section { margin-top: 14px; }
 .section-head {
@@ -196,7 +299,7 @@ body {
 .meta-row {
   display: flex; align-items: flex-start; justify-content: space-between;
   gap: 12px; padding: 8px 10px;
-  background: var(--surface); border-radius: 7px; margin-bottom: 6px;
+  background: var(--surface2); border-radius: 7px; margin-bottom: 6px;
 }
 .meta-text { flex: 1; font-size: 12px; color: var(--text); line-height: 1.5; }
 .copy-btn {
@@ -208,6 +311,16 @@ body {
 .copy-btn:hover { color: var(--text); }
 .copy-btn.ok { border-color: var(--teal); color: var(--teal); }
 
+/* CARD EXPORT */
+.card-export-btn {
+  font-size: 11px; padding: 3px 9px; border-radius: 5px;
+  border: 1.5px solid var(--border); background: transparent;
+  color: var(--muted); cursor: pointer;
+  transition: all 0.12s; font-family: 'DM Sans', sans-serif;
+  display: flex; align-items: center; gap: 4px;
+}
+.card-export-btn:hover { color: var(--accent); border-color: var(--accent-border); }
+
 /* PILLS */
 .pill {
   font-size: 11px; padding: 2px 9px; border-radius: 99px;
@@ -216,36 +329,24 @@ body {
 
 /* STATUS PILLS */
 .s-waiting { background: rgba(77,159,255,0.15); color: var(--blue); border: 1px solid rgba(77,159,255,0.3); }
-.s-approved { background: rgba(62,207,178,0.12); color: var(--teal); border: 1px solid rgba(62,207,178,0.3); }
-.s-production { background: rgba(255,140,66,0.12); color: var(--orange); border: 1px solid rgba(255,140,66,0.3); }
-.s-live { background: rgba(232,255,71,0.1); color: var(--accent); border: 1px solid rgba(232,255,71,0.25); }
-.s-winner { background: rgba(167,139,250,0.12); color: var(--purple); border: 1px solid rgba(167,139,250,0.3); }
 .s-revision { background: rgba(255,77,77,0.1); color: var(--red); border: 1px solid rgba(255,77,77,0.3); }
+.s-ready { background: rgba(29,185,84,0.1); color: var(--accent); border: 1px solid rgba(29,185,84,0.3); }
 .s-archive { background: rgba(107,107,107,0.15); color: var(--muted); border: 1px solid var(--border2); }
-.s-retired { background: rgba(107,107,107,0.08); color: var(--muted2); border: 1px solid var(--border); }
 
 .stage-pill { background: rgba(255,255,255,0.05); color: var(--muted); border: 1px solid var(--border2); }
 .format-pill { background: rgba(255,255,255,0.04); color: var(--muted2); border: 1.5px solid var(--border); }
 
 /* LOAD */
 .load { display: flex; align-items: center; justify-content: center; height: 40vh; color: var(--muted); }
-.toast { position: fixed; bottom: 24px; right: 24px; background: var(--surface); border: 1px solid var(--border2); color: var(--text); padding: 12px 18px; border-radius: 8px; font-size: 13px; z-index: 200; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
+.toast {
+  position: fixed; bottom: 24px; right: 24px; background: var(--surface);
+  border: 1px solid var(--border2); color: var(--text); padding: 12px 18px;
+  border-radius: 8px; font-size: 13px; z-index: 200; opacity: 0;
+  transition: opacity 0.2s; pointer-events: none;
+}
 .toast.show { opacity: 1; }
 .toast.success { border-color: var(--teal); color: var(--teal); }
-
-.stats-row {
-  display: grid; grid-template-columns: repeat(7,1fr); gap: 6px;
-  padding: 14px 28px 0;
-}
-.stat-tile {
-  background: var(--surface); border: 1.5px solid var(--border);
-  border-radius: 8px; padding: 10px 12px; text-align: center;
-  cursor: pointer; transition: all 0.15s;
-}
-.stat-tile:hover { border-color: var(--border2); }
-.stat-tile.active { border-color: var(--accent); background: var(--accent-dim); box-shadow: 0 0 0 3px rgba(29,185,84,0.1); }
-.stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 24px; line-height: 1; }
-.stat-lbl { font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-top: 3px; }
+.toast.error { border-color: var(--red); color: var(--red); }
 </style>
 </head>
 <body>
@@ -265,12 +366,14 @@ body {
   </div>
   <div class="nav-right">
     <span class="ad-count" id="totalCount"></span>
+    <button class="export-btn" onclick="exportAllCSV()" title="Export all ads as CSV">
+      ↓ Export All CSV
+    </button>
   </div>
 </nav>
 
 <div class="stage-bar" id="stageBar"></div>
 
-<div id="statsRow" class="stats-row"></div>
 <div class="filter-bar" id="filterBar"></div>
 <div class="main" id="main"><div class="load">Loading pipeline…</div></div>
 
@@ -283,34 +386,42 @@ const sb=supabase.createClient(SB_URL,SB_KEY);
 
 const STAGES=[
   {key:'Waiting for Review', cls:'s-waiting'},
-  {key:'Approved for Design', cls:'s-approved'},
-  {key:'In Production', cls:'s-production'},
-  {key:'Live', cls:'s-live'},
-  {key:'Winner', cls:'s-winner'},
-  {key:'Needs Revision', cls:'s-revision'},
-  {key:'Archived', cls:'s-archive'},
-  {key:'Retired', cls:'s-retired'}
+  {key:'Needs Revision',     cls:'s-revision'},
+  {key:'Ready for Production', cls:'s-ready'},
+  {key:'Archived',           cls:'s-archive'}
 ];
-// Map old statuses to new
+
+// Migrate old statuses
 const STATUS_MAP={
   'Drafts':'Waiting for Review',
   'Editing':'Waiting for Review',
   'Review / Allocation':'Waiting for Review',
-  'In Design':'Approved for Design',
-  'Live':'Live',
-  'Winner':'Winner',
+  'In Design':'Waiting for Review',
+  'Approved for Design':'Waiting for Review',
+  'In Production':'Ready for Production',
+  'Live':'Ready for Production',
+  'Winner':'Ready for Production',
   'Archive':'Archived',
-  'Retired':'Retired'
+  'Retired':'Archived'
 };
-const SCENE_ID_CLASS={ha:'hook',hb:'hook',hc:'hook',pr:'problem',ins:'insight',sol:'solution',ct:'cta'};
+
+const FORMATS=[
+  'Meta Video','Meta Static','TikTok','Meta Story',
+  'Spotify / Podcast Ad','Out of Home (Billboard)'
+];
+
+const FUNNEL_STAGES=['Awareness','Consideration','Intent','Retargeting','Usage / Expansion'];
 
 let ads=[];
 let activeStage='Waiting for Review';
 let search='';
 let fStage='All';
 let expanded=new Set();
+let editingId=null;
+// Stores unsaved revision text per card
+let revisionDraft={};
 
-function normalizeStatus(s){return STATUS_MAP[s]||s;}
+function normalizeStatus(s){ return STATUS_MAP[s]||s; }
 
 function toast(msg,type=''){
   const t=document.getElementById('toast');
@@ -320,7 +431,10 @@ function toast(msg,type=''){
 
 async function load(){
   const{data,error}=await sb.from('ads').select('*').order('created_at',{ascending:false});
-  if(error){document.getElementById('main').innerHTML=`<div class="load">Error: ${error.message}</div>`;return;}
+  if(error){
+    document.getElementById('main').innerHTML=`<div class="load">Error: ${error.message}</div>`;
+    return;
+  }
   ads=(data||[]).map(r=>({
     ...r,
     status:normalizeStatus(r.status||'Waiting for Review'),
@@ -330,7 +444,8 @@ async function load(){
     visualStyle:r.visual_style||'',
     scenes:r.scenes||[],
     metaCopy:r.meta_copy||{},
-    metrics:r.metrics||{}
+    metrics:r.metrics||{},
+    revisionNotes:r.revision_notes||''
   }));
   render();
 }
@@ -345,17 +460,23 @@ function filtered(){
   });
 }
 
-function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function esc(s){
+  return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
 
 function statusPillClass(s){
-  const map={'Waiting for Review':'s-waiting','Approved for Design':'s-approved','In Production':'s-production','Live':'s-live','Winner':'s-winner','Needs Revision':'s-revision','Archived':'s-archive','Retired':'s-retired'};
+  const map={
+    'Waiting for Review':'s-waiting',
+    'Needs Revision':'s-revision',
+    'Ready for Production':'s-ready',
+    'Archived':'s-archive'
+  };
   return map[s]||'stage-pill';
 }
 
 function render(){
   const vis=filtered();
-  const total=ads.length;
-  document.getElementById('totalCount').textContent=total+' total ads';
+  document.getElementById('totalCount').textContent=ads.length+' total ads';
 
   // Stage tabs
   document.getElementById('stageBar').innerHTML=STAGES.map(s=>{
@@ -371,12 +492,11 @@ function render(){
     <input class="filter-input" placeholder="Search…" value="${esc(search)}" oninput="search=this.value;render()">
     <select class="filter-select" onchange="fStage=this.value;render()">
       <option value="All" ${fStage==='All'?'selected':''}>All Funnel Stages</option>
-      ${['Awareness','Consideration','Intent','Retargeting','Usage / Expansion'].map(s=>`<option value="${s}" ${fStage===s?'selected':''}>${s}</option>`).join('')}
+      ${FUNNEL_STAGES.map(s=>`<option value="${s}" ${fStage===s?'selected':''}>${s}</option>`).join('')}
     </select>
     ${(search||fStage!=='All')?`<button class="clear-btn" onclick="search='';fStage='All';render()">Clear</button>`:''}
   `;
 
-  // Main
   if(!vis.length){
     const isEmpty=ads.filter(a=>a.status===activeStage).length===0;
     document.getElementById('main').innerHTML=`<div class="empty-state">
@@ -392,24 +512,31 @@ function render(){
 
 function adCard(a){
   const open=expanded.has(a.id);
+  const isEditing=editingId===a.id;
   const scenes=(a.scenes||[]).filter(s=>s.vo||s.prompt);
   const mc=a.metaCopy||{};
+  const isRevision=a.status==='Needs Revision';
 
   const sceneClass=s=>{
     const map={ha:'hook',hb:'hook',hc:'hook',pr:'problem',ins:'insight',sol:'solution',ct:'cta'};
     return map[s.id]||'';
   };
-
   const sceneName=s=>{
     const map={ha:'Hook A',hb:'Hook B',hc:'Hook C',pr:'Problem',ins:'Insight',sol:'Solution',ct:'CTA'};
     return map[s.id]||s.label||s.id;
   };
 
-  const expandedHtml=open?`<div class="card-expanded">
+  // VIEW mode expanded content
+  const viewExpanded=open&&!isEditing?`<div class="card-expanded">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <span style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);">Brief Details</span>
+      <button class="card-export-btn" onclick="event.stopPropagation();exportOneCSV('${a.id}')">↓ Export this ad</button>
+    </div>
     <div class="exp-grid">
       ${a.funnelStage?`<div class="exp-field"><div class="exp-label">Funnel Stage</div><div class="exp-val">${esc(a.funnelStage)}</div></div>`:''}
       ${a.job?`<div class="exp-field"><div class="exp-label">Job</div><div class="exp-val">${esc(a.job)}</div></div>`:''}
       ${a.tone?`<div class="exp-field"><div class="exp-label">Tone</div><div class="exp-val">${esc(a.tone)}</div></div>`:''}
+      ${a.format?`<div class="exp-field"><div class="exp-label">Format / Channel</div><div class="exp-val">${esc(a.format)}</div></div>`:''}
       ${a.productionMethod?`<div class="exp-field"><div class="exp-label">Production</div><div class="exp-val">${esc(a.productionMethod)}</div></div>`:''}
       ${a.visualStyle?`<div class="exp-field"><div class="exp-label">Visual Style</div><div class="exp-val">${esc(a.visualStyle)}</div></div>`:''}
       ${a.coreInsight?`<div class="exp-field" style="grid-column:1/-1"><div class="exp-label">Core Insight</div><div class="exp-val">${esc(a.coreInsight)}</div></div>`:''}
@@ -435,7 +562,83 @@ function adCard(a){
     </div>`:''}
   </div>`:'';
 
-  return`<div class="ad-card ${a.status==='Winner'?'winner':''}" id="card-${a.id}">
+  // REVISION NOTES section (always visible when status = Needs Revision)
+  const revisionSection=isRevision?`<div class="revision-section" onclick="event.stopPropagation()">
+    <div class="revision-head">Revision Notes</div>
+    <textarea
+      class="revision-textarea"
+      placeholder="Describe what needs to change — be specific about which scenes, copy, or direction to revise…"
+      id="rev-${a.id}"
+      oninput="revisionDraft['${a.id}']=this.value"
+    >${esc(a.revisionNotes||revisionDraft[a.id]||'')}</textarea>
+    <button class="revision-save-btn" onclick="saveRevisionNotes('${a.id}')">Save Notes</button>
+    ${a.revisionNotes?`<div class="revision-saved-note">Last saved: "${esc(a.revisionNotes.substring(0,80))}${a.revisionNotes.length>80?'…':''}"</div>`:''}
+  </div>`:'';
+
+  // EDIT mode
+  const editSection=isEditing?`<div class="edit-section" onclick="event.stopPropagation()">
+    <div class="edit-section-head">
+      <span>Editing Brief</span>
+    </div>
+    <div class="edit-grid">
+      <div class="edit-field full">
+        <label class="edit-lbl">Concept / Title</label>
+        <input class="edit-input" id="edit-concept-${a.id}" value="${esc(a.concept||'')}">
+      </div>
+      <div class="edit-field full">
+        <label class="edit-lbl">Core Insight</label>
+        <textarea class="edit-textarea" id="edit-insight-${a.id}">${esc(a.coreInsight||'')}</textarea>
+      </div>
+      <div class="edit-field">
+        <label class="edit-lbl">Funnel Stage</label>
+        <select class="edit-select" id="edit-funnel-${a.id}">
+          <option value="">— select —</option>
+          ${FUNNEL_STAGES.map(s=>`<option value="${s}" ${a.funnelStage===s?'selected':''}>${s}</option>`).join('')}
+        </select>
+      </div>
+      <div class="edit-field">
+        <label class="edit-lbl">Format / Channel</label>
+        <select class="edit-select" id="edit-format-${a.id}">
+          <option value="">— select —</option>
+          ${FORMATS.map(f=>`<option value="${f}" ${a.format===f?'selected':''}>${f}</option>`).join('')}
+        </select>
+      </div>
+      <div class="edit-field">
+        <label class="edit-lbl">Tone</label>
+        <input class="edit-input" id="edit-tone-${a.id}" value="${esc(a.tone||'')}">
+      </div>
+      <div class="edit-field">
+        <label class="edit-lbl">Job</label>
+        <input class="edit-input" id="edit-job-${a.id}" value="${esc(a.job||'')}">
+      </div>
+      <div class="edit-field">
+        <label class="edit-lbl">Production Method</label>
+        <input class="edit-input" id="edit-prod-${a.id}" value="${esc(a.productionMethod||'')}">
+      </div>
+      <div class="edit-field">
+        <label class="edit-lbl">Visual Style</label>
+        <input class="edit-input" id="edit-visual-${a.id}" value="${esc(a.visualStyle||'')}">
+      </div>
+      <div class="edit-field full">
+        <label class="edit-lbl">Primary Text (Meta Copy)</label>
+        <textarea class="edit-textarea" id="edit-primary-${a.id}">${esc((a.metaCopy||{}).primaryText||'')}</textarea>
+      </div>
+      <div class="edit-field">
+        <label class="edit-lbl">Headline (Meta Copy)</label>
+        <input class="edit-input" id="edit-headline-${a.id}" value="${esc((a.metaCopy||{}).headline||'')}">
+      </div>
+      <div class="edit-field">
+        <label class="edit-lbl">Description (Meta Copy)</label>
+        <input class="edit-input" id="edit-desc-${a.id}" value="${esc((a.metaCopy||{}).description||'')}">
+      </div>
+    </div>
+    <div class="edit-actions">
+      <button class="cancel-btn" onclick="cancelEdit('${a.id}')">Cancel</button>
+      <button class="save-btn" onclick="saveEdit('${a.id}')">Save Changes</button>
+    </div>
+  </div>`:'';
+
+  return`<div class="ad-card ${isRevision?'revision':''}" id="card-${a.id}">
     <div class="card-main" onclick="togExp('${a.id}')">
       <div class="card-body">
         <div class="card-pills">
@@ -451,10 +654,13 @@ function adCard(a){
         <select class="status-select" onchange="doStatus('${a.id}',this.value)">
           ${STAGES.map(s=>`<option value="${s.key}" ${a.status===s.key?'selected':''}>${s.key}</option>`).join('')}
         </select>
+        <button class="icon-btn ${isEditing?'active-edit':''}" onclick="togEdit('${a.id}')" title="${isEditing?'Cancel edit':'Edit this ad'}">✎</button>
         <button class="icon-btn danger" onclick="if(confirm('Delete this ad?'))doDelete('${a.id}')" title="Delete">✕</button>
       </div>
     </div>
-    ${expandedHtml}
+    ${revisionSection}
+    ${viewExpanded}
+    ${editSection}
   </div>`;
 }
 
@@ -465,13 +671,80 @@ function cpTxt(btn,txt){
 }
 
 window.setStage=s=>{activeStage=s;render();};
-window.togExp=id=>{expanded.has(id)?expanded.delete(id):expanded.add(id);render();};
+window.togExp=id=>{
+  if(editingId===id)return; // don't collapse while editing
+  expanded.has(id)?expanded.delete(id):expanded.add(id);
+  render();
+};
+
+window.togEdit=id=>{
+  if(editingId===id){
+    editingId=null;
+  } else {
+    editingId=id;
+    expanded.add(id);
+  }
+  render();
+};
+
+window.cancelEdit=id=>{
+  editingId=null;
+  render();
+};
+
+window.saveEdit=async id=>{
+  const g=sel=>{ const el=document.getElementById(sel); return el?el.value:''; };
+  const updates={
+    concept:      g(`edit-concept-${id}`),
+    core_insight: g(`edit-insight-${id}`),
+    funnel_stage: g(`edit-funnel-${id}`),
+    format:       g(`edit-format-${id}`),
+    tone:         g(`edit-tone-${id}`),
+    job:          g(`edit-job-${id}`),
+    production_method: g(`edit-prod-${id}`),
+    visual_style: g(`edit-visual-${id}`),
+    meta_copy: {
+      primaryText: g(`edit-primary-${id}`),
+      headline:    g(`edit-headline-${id}`),
+      description: g(`edit-desc-${id}`)
+    }
+  };
+  const{error}=await sb.from('ads').update(updates).eq('id',id);
+  if(error){ toast('Save failed: '+error.message,'error'); return; }
+  // Update local
+  ads=ads.map(a=>a.id===id?{
+    ...a,
+    concept:updates.concept,
+    coreInsight:updates.core_insight,
+    funnelStage:updates.funnel_stage,
+    format:updates.format,
+    tone:updates.tone,
+    job:updates.job,
+    productionMethod:updates.production_method,
+    visualStyle:updates.visual_style,
+    metaCopy:updates.meta_copy
+  }:a);
+  editingId=null;
+  toast('Saved ✓','success');
+  render();
+};
+
+window.saveRevisionNotes=async id=>{
+  const el=document.getElementById(`rev-${id}`);
+  if(!el)return;
+  const notes=el.value;
+  const{error}=await sb.from('ads').update({revision_notes:notes}).eq('id',id);
+  if(error){ toast('Save failed: '+error.message,'error'); return; }
+  ads=ads.map(a=>a.id===id?{...a,revisionNotes:notes}:a);
+  toast('Revision notes saved','success');
+  render();
+};
 
 window.doStatus=async(id,status)=>{
   ads=ads.map(a=>a.id===id?{...a,status}:a);
   render();
   const{error}=await sb.from('ads').update({status}).eq('id',id);
-  if(error)toast('Save failed: '+error.message);
+  if(error) toast('Save failed: '+error.message,'error');
   else toast('Moved to '+status,'success');
 };
 
@@ -480,6 +753,66 @@ window.doDelete=async id=>{
   render();
   await sb.from('ads').delete().eq('id',id);
   toast('Deleted');
+};
+
+// ─── CSV EXPORT ───────────────────────────────────────────────────────────────
+
+function adToRow(a){
+  const mc=a.metaCopy||{};
+  const scenes=(a.scenes||[]);
+  const sceneText=scenes.map(s=>`[${s.id||''}] VO: ${s.vo||''} | Visual: ${s.prompt||''}`).join(' || ');
+  return [
+    a.id||'',
+    a.concept||'',
+    a.status||'',
+    a.funnelStage||'',
+    a.format||'',
+    a.tone||'',
+    a.job||'',
+    a.coreInsight||'',
+    a.productionMethod||'',
+    a.visualStyle||'',
+    mc.primaryText||'',
+    mc.headline||'',
+    mc.description||'',
+    sceneText,
+    a.revisionNotes||''
+  ];
+}
+
+const CSV_HEADERS=[
+  'ID','Concept','Status','Funnel Stage','Format / Channel','Tone','Job',
+  'Core Insight','Production Method','Visual Style',
+  'Meta – Primary Text','Meta – Headline','Meta – Description',
+  'Scenes','Revision Notes'
+];
+
+function toCSV(rows){
+  const wrap=v=>'"'+String(v).replace(/"/g,'""')+'"';
+  return [CSV_HEADERS.map(wrap).join(','),
+    ...rows.map(r=>r.map(wrap).join(','))
+  ].join('\n');
+}
+
+function downloadCSV(csv,filename){
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download=filename; a.click();
+  URL.revokeObjectURL(url);
+}
+
+window.exportAllCSV=()=>{
+  if(!ads.length){ toast('No ads to export','error'); return; }
+  downloadCSV(toCSV(ads.map(adToRow)),'mudflap-ads-all.csv');
+  toast('Exported '+ads.length+' ads','success');
+};
+
+window.exportOneCSV=id=>{
+  const a=ads.find(x=>x.id===id);
+  if(!a){ toast('Ad not found','error'); return; }
+  downloadCSV(toCSV([adToRow(a)]),`mudflap-ad-${id}.csv`);
+  toast('Exported','success');
 };
 
 load();
