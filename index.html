@@ -527,7 +527,7 @@ function adCard(a){
   };
 
   // Shared ad content — shown in view mode AND at top of edit mode
-  const adContent=`<div class="card-expanded" onclick="event.stopPropagation()">
+  const adContent=`<div class="card-expanded">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
       <span style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);">Brief Details</span>
       <button class="card-export-btn" onclick="event.stopPropagation();exportOneCSV('${a.id}')">↓ Export this ad</button>
@@ -566,7 +566,7 @@ function adCard(a){
   const viewExpanded = isEditing ? adContent : (open ? adContent : '');
 
   // REVISION NOTES section (always visible when status = Needs Revision)
-  const revisionSection=isRevision?`<div class="revision-section" onclick="event.stopPropagation()">
+  const revisionSection=isRevision?`<div class="revision-section">
     <div class="revision-head">Revision Notes</div>
     <textarea
       class="revision-textarea"
@@ -579,7 +579,7 @@ function adCard(a){
   </div>`:'';
 
   // EDIT mode
-  const editSection=isEditing?`<div class="edit-section" onclick="event.stopPropagation()">
+  const editSection=isEditing?`<div class="edit-section">
     <div class="edit-section-head">
       <span>✎ Edit Fields Below</span>
       <span style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0;text-transform:none;">Ad content shown above for reference</span>
@@ -643,7 +643,7 @@ function adCard(a){
   </div>`:'';
 
   return`<div class="ad-card ${isRevision?'revision':''}" id="card-${a.id}">
-    <div class="card-main" onclick="togExp('${a.id}')">
+    <div class="card-main" onclick="if(event.target===this||event.target.closest('.card-body'))togExp('${a.id}')">
       <div class="card-body">
         <div class="card-pills">
           <span class="pill ${statusPillClass(a.status)}">${a.status}</span>
