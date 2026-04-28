@@ -527,7 +527,7 @@ function adCard(a){
   };
 
   // Shared ad content — shown in view mode AND at top of edit mode
-  const adContent=`<div class="card-expanded">
+  const adContent=`<div class="card-expanded" onclick="event.stopPropagation()">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
       <span style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);">Brief Details</span>
       <button class="card-export-btn" onclick="event.stopPropagation();exportOneCSV('${a.id}')">↓ Export this ad</button>
@@ -574,7 +574,7 @@ function adCard(a){
       id="rev-${a.id}"
       oninput="revisionDraft['${a.id}']=this.value"
     >${esc(a.revisionNotes||revisionDraft[a.id]||'')}</textarea>
-    <button class="revision-save-btn" onclick="saveRevisionNotes('${a.id}')">Save Notes</button>
+    <button class="revision-save-btn" onclick="event.stopPropagation();saveRevisionNotes('${a.id}')">Save Notes</button>
     ${a.revisionNotes?`<div class="revision-saved-note">Last saved: "${esc(a.revisionNotes.substring(0,80))}${a.revisionNotes.length>80?'…':''}"</div>`:''}
   </div>`:'';
 
@@ -636,7 +636,7 @@ function adCard(a){
         <input class="edit-input" id="edit-desc-${a.id}" value="${esc((a.metaCopy||{}).description||'')}">
       </div>
     </div>
-    <div class="edit-actions">
+    <div class="edit-actions" onclick="event.stopPropagation()">
       <button class="cancel-btn" onclick="cancelEdit('${a.id}')">Cancel</button>
       <button class="save-btn" onclick="saveEdit('${a.id}')">Save Changes</button>
     </div>
