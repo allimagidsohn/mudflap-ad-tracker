@@ -562,8 +562,8 @@ function adCard(a){
     </div>`:''}
   </div>`;
 
-  // Show ad content in view mode (expanded, not editing), OR always when editing
-  const viewExpanded=(open&&!isEditing)||isEditing ? adContent : '';
+  // Show when editing (always) or when expanded in view mode
+  const viewExpanded = isEditing ? adContent : (open ? adContent : '');
 
   // REVISION NOTES section (always visible when status = Needs Revision)
   const revisionSection=isRevision?`<div class="revision-section" onclick="event.stopPropagation()">
@@ -684,9 +684,10 @@ window.togExp=id=>{
 window.togEdit=id=>{
   if(editingId===id){
     editingId=null;
+    // keep expanded so card stays open after cancel
   } else {
     editingId=id;
-    expanded.add(id);
+    expanded.add(id); // ensure content is visible
   }
   render();
 };
