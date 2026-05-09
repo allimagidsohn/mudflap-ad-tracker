@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: mudflap-ad-tracker
+    runtime: node
+    plan: free
+    buildCommand: pnpm install && pnpm build
+    startCommand: pnpm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEON_POSTGRES_CONNECTION_STRING
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
