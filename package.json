@@ -6,7 +6,7 @@
     "dev:server": "node --import=dotenv/config src/server/index.js",
     "dev:all": "concurrently -k \"pnpm dev\" \"pnpm dev:server\"",
     "build": "vite build && pnpm run build:server",
-    "build:server": "esbuild src/server/index.js --bundle --platform=node --format=esm --outfile=dist/server.js --external:pg",
+    "build:server": "esbuild src/server/index.js --bundle --platform=node --format=esm --outfile=dist/server.js --external:pg --external:dotenv --packages=external",
     "start": "node --import=dotenv/config dist/server.js",
     "preview": "vite preview"
   },

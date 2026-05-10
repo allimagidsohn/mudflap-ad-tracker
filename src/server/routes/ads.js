@@ -70,6 +70,9 @@ app.post('/', async (c) => {
 
 app.patch('/:id', async (c) => {
   const id = c.req.param('id')
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
+    return c.json({ error: 'Invalid ad ID' }, 400)
+  }
   let body
   try {
     body = await c.req.json()
@@ -107,6 +110,9 @@ app.patch('/:id', async (c) => {
 
 app.delete('/:id', async (c) => {
   const id = c.req.param('id')
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
+    return c.json({ error: 'Invalid ad ID' }, 400)
+  }
   try {
     const { rowCount } = await pool.query('DELETE FROM ads WHERE id = $1', [id])
     if (!rowCount) {
